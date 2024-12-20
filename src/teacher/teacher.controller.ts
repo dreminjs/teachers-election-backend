@@ -41,8 +41,8 @@ export class TeacherController {
   @Get()
   async findMany(
     @Query('take') take: number,
-    page: number,
-    search: string
+    @Query('page') page: number,
+    @Query('search') search: string
   ): Promise<Teacher[]> {
     return await this.teacherService.findMany({
       take: 100,
