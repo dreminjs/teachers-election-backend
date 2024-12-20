@@ -7,7 +7,7 @@ export class TeacherReviewService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createOne(dto: Prisma.TeacherReviewCreateInput) {
-    return await this.prisma.teacherReview.create({ data: dto });
+    return await this.prisma.teacherReview.create({ data: dto })
   }
 
   async findMany(dto: Prisma.TeacherReviewWhereInput) {
