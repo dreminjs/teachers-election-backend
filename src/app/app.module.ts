@@ -20,7 +20,7 @@ import { join } from 'path';
     TeacherModule,
     TeacherReviewModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', "images"),
+      rootPath: join(__dirname, '..', '..',"..", "images"),
     }),
   ],
   controllers: [AppController],
