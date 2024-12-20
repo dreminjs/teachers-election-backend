@@ -6,6 +6,7 @@ import { AuthModule } from '../auth';
 import { PasswordModule } from 'src/password';
 import { TeacherModule } from 'src/teacher/';
 import { ConfigModule } from '@nestjs/config';
+import { TeacherReviewModule } from 'src/teacher-review';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ConfigModule } from '@nestjs/config';
     PasswordModule,
     ConfigModule,
     TeacherModule,
+    TeacherReviewModule
   ],
   controllers: [AppController],
 })

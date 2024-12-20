@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post, UseGuards } from '@nestjs/common';
 import { TeacherReviewService } from './teacher-review.service';
 import { CreateTeacherReviewDto } from './dto/create-teacher-review.dto';
 import { AccessTokenGuard } from 'src/auth';
@@ -10,13 +10,17 @@ import { CurrentUser } from 'src/user';
 export class TeacherReviewController {
   constructor(private readonly teacherReviewService: TeacherReviewService) {}
 
+  private logger = new Logger(TeacherReviewController.name);
+
   @Post()
   async createOne(
     @Body() body: CreateTeacherReviewDto,
     @CurrentUser() { id: userId }: User
   ) {
+
+    this.logger.log(body);
     return await this.teacherReviewService.createOne({
-      message: body.message,
+      message: body?.message,
       experienced: body.experienced,
       friendliness: body.friendliness,
       strictness: body.strictness,
