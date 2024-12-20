@@ -24,8 +24,8 @@ export class TeacherReviewController {
     @CurrentUser() { id: userId }: User
   ) {
     return await this.teacherReviewService.createOne({
-      friendliness: body.friendliness,
       strictness: body.strictness,
+      friendliness: body.friendliness,
       smartless: body.smartless,
       freebie: body.freebie,
       experienced: body.experienced,
