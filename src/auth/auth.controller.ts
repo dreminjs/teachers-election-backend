@@ -28,8 +28,6 @@ export class AuthController {
     private readonly tokenService: TokenService
   ) {}
 
-  private logger = new Logger(AuthController.name);
-
   @HttpCode(HttpStatus.OK)
   @UseGuards(SigninGuard)
   @Post('signin')
@@ -43,8 +41,6 @@ export class AuthController {
     const user = await this.userService.findOne({
       email: body.email,
     });
-
-    this.logger.log(user);
 
     await this.tokenService.saveRefreshToken({
       userId: user.id,

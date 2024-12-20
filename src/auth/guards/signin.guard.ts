@@ -1,6 +1,8 @@
 import {
   CanActivate,
   ExecutionContext,
+  HttpException,
+  HttpStatus,
   Injectable,
   Logger,
 } from '@nestjs/common';
@@ -22,9 +24,9 @@ export class SigninGuard implements CanActivate {
 
     const user = await this.userService.findOne({ email });
 
-    if (!user) return false;
+    if (!user) throw new HttpException('Такой пользователь не существует', HttpStatus.BAD_REQUEST)
 
-    return await this.passwordService.comparePassword(password, user.password);
+    return true
   }
 }
 
