@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Logger,
@@ -94,5 +95,11 @@ export class AuthController {
       email: user.email,
       id: user.id,
     };
+  }
+
+
+  @Get("/check-admin")
+  async checkAdmin(@Res({ passthrough: true }) res) {
+    
   }
 }
