@@ -22,9 +22,10 @@ export class SigninGuard implements CanActivate {
 
     const user = await this.userService.findOne({ email });
 
-
-    if (!user) return false
+    if (!user) return false;
 
     return await this.passwordService.comparePassword(password, user.password);
   }
 }
+
+// ЩА ПРИДУ
