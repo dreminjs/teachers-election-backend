@@ -25,11 +25,11 @@ export class TeacherReviewController {
   ) {
     return await this.teacherReviewService.createOne({
       message: body?.message,
-      experienced: body.experienced,
       friendliness: body.friendliness,
       strictness: body.strictness,
       smartless: body.smartless,
       freebie: body.freebie,
+      experienced: body.experienced,
       user: {
         connect: { id: userId },
       },
