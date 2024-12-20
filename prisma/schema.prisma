@@ -46,7 +46,7 @@ model TeacherReview {
 }
 
 model RefreshToken {
-  token  String @unique
+  token  String 
   id     String @id @default(uuid())
   userId String
   user   User   @relation(fields: [userId], references: [id])
