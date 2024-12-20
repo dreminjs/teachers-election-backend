@@ -24,7 +24,6 @@ export class TeacherReviewController {
     @CurrentUser() { id: userId }: User
   ) {
     return await this.teacherReviewService.createOne({
-      message: body?.message,
       friendliness: body.friendliness,
       strictness: body.strictness,
       smartless: body.smartless,
@@ -34,6 +33,7 @@ export class TeacherReviewController {
         connect: { id: userId },
       },
       isChecked: body?.message ? true : false,
+      message: body?.message,
     });
   }
 
