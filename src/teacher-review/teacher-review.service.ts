@@ -17,4 +17,8 @@ export class TeacherReviewService {
   async findOne(where: Prisma.TeacherReviewWhereUniqueInput) {
     return await this.prisma.teacherReview.findFirst({ where });
   }
+
+  async updateOne(where: Prisma.TeacherReviewWhereUniqueInput, dto: Prisma.TeacherReviewUpdateInput) {
+    return await this.prisma.teacherReview.update({ where, data: dto });
+  }
 }
