@@ -12,5 +12,5 @@ export class CreateTeacherReviewDto {
   @IsNumber()
   strictness: number;
   @IsNumber()
-  smartless: number;
+  smartless: number
 }
