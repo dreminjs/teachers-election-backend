@@ -20,16 +20,9 @@ model Teacher {
   subject   Subject @relation(fields: [subjectId], references: [id])
 }
 
-model Vote {
-  id     String  @id @default(uuid())
-  User   User?   @relation(fields: [userId], references: [id])
-  userId String?
-}
-
 model User {
   id            String          @id @default(uuid())
   role          Roles
-  votes         Vote[]
   email         String          @unique
   salt          String
   password      String
@@ -39,12 +32,17 @@ model User {
 }
 
 model TeacherReview {
-  id        String  @id @default(uuid())
-  message   String
-  isChecked Boolean
-  userId    String
-  user      User    @relation(fields: [userId], references: [id])
-  Like      Like[]
+  id           String  @id @default(uuid())
+  message      String?
+  isChecked    Boolean
+  freebie      Int
+  friendliness Int
+  experienced  Int
+  strictness   Int
+  smartless    Int
+  userId       String
+  user         User    @relation(fields: [userId], references: [id])
+  Like         Like[]
 }
 
 model RefreshToken {

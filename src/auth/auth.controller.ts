@@ -17,11 +17,11 @@ import { SigninGuard } from './guards/signin.guard';
 import { SigninDto } from './dto/signin.dto';
 import { User } from '@prisma/client';
 import { TokenService } from 'src/token';
+import { IAuthResponse } from 'src/shared/interfaces/auth.interfaces';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly passwordService: PasswordService,
     private readonly tokenService: TokenService
@@ -30,16 +30,19 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(SigninGuard)
   @Post('signin')
-  async signin(@Body() body: SigninDto, @Res({ passthrough: true }) res) {
+  async signin(
+    @Body() body: SigninDto,
+    @Res({ passthrough: true }) res
+  ): Promise<IAuthResponse> {
     const { accessToken, refreshToken } =
       await this.tokenService.generateTokens(body.email);
 
-    const { id: userId } = await this.userService.findOne({
+    const user = await this.userService.findOne({
       email: body.email,
     });
 
     await this.tokenService.saveRefreshToken({
-      userId,
+      userId: user.id,
       token: refreshToken,
     });
 
@@ -47,7 +50,10 @@ export class AuthController {
 
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
 
-    return body;
+    return {
+      email: user.email,
+      id: user.id,
+    };
   }
 
   @HttpCode(HttpStatus.OK)
@@ -56,7 +62,7 @@ export class AuthController {
   async signup(
     @Body() { email, password }: SignupDto,
     @Res({ passthrough: true }) res
-  ): Promise<User> {
+  ): Promise<IAuthResponse> {
     const salt = await bcrypt.genSalt(6);
 
     const hashedPassword = await this.passwordService.hashPassword(
@@ -78,6 +84,9 @@ export class AuthController {
 
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
 
-    return user;
+    return {
+      email: user.email,
+      id: user.id,
+    };
   }
 }
