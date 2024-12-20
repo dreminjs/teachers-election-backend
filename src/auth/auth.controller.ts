@@ -80,6 +80,11 @@ export class AuthController {
     const { accessToken, refreshToken } =
       await this.tokenService.generateTokens(email);
 
+    await this.tokenService.saveRefreshToken({
+      userId: user.id,
+      token: refreshToken,
+    });
+
     res.cookie('accessToken', accessToken, { httpOnly: true });
 
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
