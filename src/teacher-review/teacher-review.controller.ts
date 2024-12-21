@@ -10,7 +10,7 @@ import {
 import { TeacherReviewService } from './teacher-review.service';
 import { CreateTeacherReviewDto } from './dto/create-teacher-review.dto';
 import { AccessTokenGuard } from 'src/auth';
-import { User } from '@prisma/client';
+import { TeacherReview, User } from '@prisma/client';
 import { CurrentUser } from 'src/user';
 
 @UseGuards(AccessTokenGuard)
@@ -22,7 +22,7 @@ export class TeacherReviewController {
   async createOne(
     @Body() body: CreateTeacherReviewDto,
     @CurrentUser() { id: userId }: User
-  ) {
+  ) : Promise<TeacherReview> {
     return this.teacherReviewService.createOne({
       ...body,
       user: { connect: { id: userId } },

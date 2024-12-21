@@ -2,7 +2,7 @@ import { IsNumber, IsOptional } from 'class-validator';
 
 export class CreateTeacherReviewDto {
   @IsOptional()
-  message?: string;
+  message: string | null 
   @IsNumber()
   freebie: number;
   @IsNumber()
