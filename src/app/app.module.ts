@@ -9,9 +9,11 @@ import { ConfigModule } from '@nestjs/config';
 import { TeacherReviewModule } from 'src/teacher-review';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { SubjectModule } from 'src/subject';
 
 @Module({
   imports: [
+    SubjectModule,
     UserModule,
     PrismaModule,
     AuthModule,
