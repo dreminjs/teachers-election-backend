@@ -7,11 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Roles {
-  Role
-  User
-}
-
 model Teacher {
   id        String  @id @default(uuid())
   fullName  String
@@ -26,8 +21,8 @@ model User {
   email         String          @unique
   salt          String
   password      String
-  RefreshToken  RefreshToken[]
   Like          Like[]
+  RefreshToken  RefreshToken[]
   TeacherReview TeacherReview[]
 }
 
@@ -41,12 +36,12 @@ model TeacherReview {
   strictness   Int
   smartless    Int
   userId       String
-  user         User    @relation(fields: [userId], references: [id])
   Like         Like[]
+  user         User    @relation(fields: [userId], references: [id])
 }
 
 model RefreshToken {
-  token  String 
+  token  String
   id     String @id @default(uuid())
   userId String
   user   User   @relation(fields: [userId], references: [id])
@@ -55,13 +50,18 @@ model RefreshToken {
 model Like {
   id              String        @id @default(uuid())
   userId          String
-  user            User          @relation(fields: [userId], references: [id])
-  teacherReview   TeacherReview @relation(fields: [teacherReviewId], references: [id])
   teacherReviewId String
+  teacherReview   TeacherReview @relation(fields: [teacherReviewId], references: [id])
+  user            User          @relation(fields: [userId], references: [id])
 }
 
 model Subject {
   id      String    @id @default(uuid())
   title   String
   Teacher Teacher[]
+}
+
+enum Roles {
+  Role
+  User
 }
