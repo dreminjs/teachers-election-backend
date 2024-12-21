@@ -19,7 +19,7 @@ import { SigninGuard } from './guards/signin.guard';
 import { SigninDto } from './dto/signin.dto';
 import { User } from '@prisma/client';
 import { TokenService } from 'src/token';
-import { IAuthResponse } from 'src/shared/interfaces/auth.interfaces';
+import { IAuthResponse } from './interfaces/auth.interfaces';
 
 @Controller('auth')
 export class AuthController {
@@ -97,9 +97,4 @@ export class AuthController {
     };
   }
 
-
-  @Get("/check-admin")
-  async checkAdmin(@Res({ passthrough: true }) res) {
-    
-  }
 }

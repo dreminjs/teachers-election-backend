@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Logger,
   Param,
@@ -22,12 +23,12 @@ export class TeacherReviewController {
   async createOne(
     @Body() body: CreateTeacherReviewDto,
     @CurrentUser() { id: userId }: User
-  ) : Promise<TeacherReview> {
+  ): Promise<TeacherReview> {
     return this.teacherReviewService.createOne({
       ...body,
       user: { connect: { id: userId } },
-      isChecked: false
-    })
+      isChecked: false,
+    });
   }
 
   @Get(':teacherId')
@@ -36,5 +37,10 @@ export class TeacherReviewController {
       id: teacherId,
       isChecked: true,
     });
+  }
+
+  @Delete(':id')
+  async deleteOne(@Param('id') id: string): Promise<void> {
+    await this.teacherReviewService.deleteOne({ id });
   }
 }

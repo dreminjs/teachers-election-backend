@@ -8,7 +8,6 @@ export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createOne(dto: Prisma.UserCreateInput) {
-
     return await this.prisma.user.create({ data: dto });
   }
 
