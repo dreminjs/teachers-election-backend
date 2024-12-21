@@ -28,7 +28,7 @@ model User {
 
 model TeacherReview {
   id           String  @id @default(uuid())
-  message      String?
+  message      String? 
   isChecked    Boolean
   freebie      Int
   friendliness Int
