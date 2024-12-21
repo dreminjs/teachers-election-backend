@@ -23,7 +23,11 @@ export class TeacherReviewController {
     @Body() body: CreateTeacherReviewDto,
     @CurrentUser() { id: userId }: User
   ) {
-    return true
+    return this.teacherReviewService.createOne({
+      ...body,
+      user: { connect: { id: userId } },
+      isChecked: false
+    })
   }
 
   @Get(':teacherId')
