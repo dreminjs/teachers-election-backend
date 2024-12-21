@@ -1,16 +1,23 @@
-import { IsNumber, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateTeacherReviewDto {
+  @IsString()
   @IsOptional()
-  message: string | null 
-  @IsNumber()
+  message: string | null;
+  @IsInt()
+  @Type(() => Number)
   freebie: number;
-  @IsNumber()
+  @IsInt()
+  @Type(() => Number)
   friendliness: number;
-  @IsNumber()
+  @IsInt()
+  @Type(() => Number)
   experienced: number;
-  @IsNumber()
+  @IsInt()
+  @Type(() => Number)
   strictness: number;
-  @IsNumber()
-  smartless: number
+  @IsInt()
+  @Type(() => Number)
+  smartless: number;
 }
