@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, Subject } from '@prisma/client';
 import { PrismaService } from 'src/prisma';
 
 @Injectable()
 export class SubjectService {
   constructor(private readonly prisma: PrismaService) {}
 
-  public async findMany(args: Prisma.SubjectFindManyArgs) {
+  public async findMany(args: Prisma.SubjectFindManyArgs): Promise<Subject[]> {
     return await this.prisma.subject.findMany(args);
   }
 

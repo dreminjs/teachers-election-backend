@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { SubjectService } from './subject.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
+import { ISubjectsResponse } from './interfaces/subject.interfaces';
 
 @Controller('subject')
 export class SubjectController {
@@ -25,9 +26,17 @@ export class SubjectController {
   public async findMany(
     @Query('cursor', ParseIntPipe) cursor: number,
     @Query('limit', ParseIntPipe) limit: number
-  ) {
+  ): Promise<ISubjectsResponse> {
     {
-      return await this.subjectService.findMany({ skip: cursor, take: limit });
+      const subjects = await this.subjectService.findMany({
+        skip: cursor,
+        take: limit,
+      });
+
+      return {
+        data: subjects,
+        nextCursor: subjects.length < limit ? null : cursor + limit,
+      };
     }
   }
   @Delete(':id')
@@ -35,8 +44,11 @@ export class SubjectController {
     return await this.subjectService.deleteOne({ id });
   }
 
-  @Put(":id")
-  public async updateOne(@Param('id') id: string, @Body() dto: CreateSubjectDto) {
+  @Put(':id')
+  public async updateOne(
+    @Param('id') id: string,
+    @Body() dto: CreateSubjectDto
+  ) {
     return await this.subjectService.updateOne({ id }, dto);
   }
 }
