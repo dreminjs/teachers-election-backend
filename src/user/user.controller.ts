@@ -1,6 +1,4 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { AccessTokenGuard } from 'src/auth';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from '@prisma/client';
