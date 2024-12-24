@@ -33,12 +33,9 @@ export class SubjectController {
         take: limit,
       });
 
-
-
-
       return {
         data: subjects,
-        nextCursor: (await this.subjectService.findMany({})).length > limit ? cursor + limit : null
+        nextCursor: subjects.length < limit ? null : cursor + limit,
       };
     }
   }
