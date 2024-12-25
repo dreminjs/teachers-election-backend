@@ -32,7 +32,7 @@ export class SubjectController {
       const subjects = await this.subjectService.findMany({
         skip: cursor,
         take: limit,
-        orderBy: { createdAt: 'desc' } as Prisma.SubjectOrderByWithRelationInput
+        orderBy: { createdAt: 'desc' } as any
       });
 
       return {
@@ -41,6 +41,7 @@ export class SubjectController {
       };
     }
   }
+
   @Delete(':id')
   public async deleteOne(@Param('id') id: string) {
     return await this.subjectService.deleteOne({ id });
