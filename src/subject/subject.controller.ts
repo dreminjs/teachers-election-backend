@@ -24,8 +24,6 @@ import { AccessTokenGuard } from 'src/auth';
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}
 
-  private logger = new Logger(SubjectController.name);
-
   @Post()
   @UseGuards(RolesGuard)
   @AllowedRoles(Roles.ADMIN)
@@ -52,6 +50,7 @@ export class SubjectController {
     }
   }
 
+  @UseGuards(RolesGuard)
   @UseGuards(SubjectGuard)
   @AllowedRoles(Roles.ADMIN)
   @Delete(':id')

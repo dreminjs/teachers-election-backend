@@ -7,6 +7,7 @@ import { PasswordModule } from 'src/password';
 import { TokenModule } from 'src/token';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { ConfigModule } from '@nestjs/config';
+import { AccessTokenGuard } from './guards/access-token.guard';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { ConfigModule } from '@nestjs/config';
     forwardRef(() => UserModule),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AccessTokenStrategy],
+  providers: [AuthService, AccessTokenStrategy,AccessTokenGuard],
   exports: [AccessTokenStrategy],
 })
 export class AuthModule {}

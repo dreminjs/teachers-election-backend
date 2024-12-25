@@ -10,7 +10,6 @@ export class AccessTokenStrategy extends PassportStrategy(
   Strategy,
   'AccessTokenStrategy'
 ) {
-
   private logger = new Logger(AccessTokenStrategy.name);
 
   constructor(
@@ -33,9 +32,9 @@ export class AccessTokenStrategy extends PassportStrategy(
     });
   }
 
-  async validate(email: string): Promise<User> {
-    const user = await this.userService.findOne({ email });
-    this.logger.log(`User ${user.email} has been validated`);
-    return user
+  async validate({ email }: { email: string }): Promise<User | null> {
+    const user = await this.userService.findOne({ where: { email } });
+
+    return user;
   }
 }

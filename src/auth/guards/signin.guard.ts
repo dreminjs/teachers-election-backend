@@ -4,11 +4,8 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
-  Logger,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
 import { UserService } from 'src/user';
-import { SignupDto } from '../dto/signup.dto';
 import { PasswordService } from 'src/password';
 
 @Injectable()
@@ -21,12 +18,26 @@ export class SigninGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const { email, password } = context.switchToHttp().getRequest();
 
-    const user = await this.userService.findOne({ email });
+    const user = await this.userService.findOne({ where: { email } });
 
-    if (!user) throw new HttpException('Такой пользователь не существует', HttpStatus.BAD_REQUEST)
+    if (!user)
+      throw new HttpException(
+        'Такой пользователь не существует',
+        HttpStatus.BAD_REQUEST
+      );
 
-    return true
+    const isPasswordValid = await this.passwordService.comparePassword(
+      password,
+      user.password
+    );
+
+    if (!isPasswordValid) {
+      throw new HttpException(
+        'Неверная пара пароль',
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    return true;
   }
 }
-
-// ЩА ПРИДУ

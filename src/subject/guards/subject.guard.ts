@@ -1,5 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, NotFoundException } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { CanActivate, ExecutionContext, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { SubjectService } from '../subject.service';
 import { Request } from 'express';
 
@@ -7,19 +6,17 @@ import { Request } from 'express';
 export class SubjectGuard implements CanActivate {
   constructor(private readonly subjectService: SubjectService) {}
 
-  canActivate(context: ExecutionContext): boolean {
+ async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
 
     const id = request.params.id;
 
-    const subject = this.subjectService.findOne({ where: { id } });
+    const subject = await this.subjectService.findOne({ where: { id } });
 
     if(!subject){
       throw new NotFoundException("Такого предмета не существует");
     }
 
     return true
-
-
   }
 }

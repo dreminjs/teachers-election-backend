@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { retry } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -11,7 +10,7 @@ export class UserService {
     return await this.prisma.user.create({ data: dto });
   }
 
-  async findOne(where: Prisma.UserWhereUniqueInput) {
-    return await this.prisma.user.findFirst({ where });
+  async findOne(args: Prisma.UserFindFirstArgs) {
+    return await this.prisma.user.findFirst({...args});
   }
 }

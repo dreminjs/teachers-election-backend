@@ -11,7 +11,7 @@ export class SignupGuard implements CanActivate {
     const { email, codeWord } = context.switchToHttp().getRequest()
       .body as SignupDto;
 
-    const user = await this.userService.findOne({ email });
+    const user = await this.userService.findOne({ where: { email } });
 
     if (user) {
       throw new HttpException('Такой пользователь уже существует', HttpStatus.BAD_REQUEST)

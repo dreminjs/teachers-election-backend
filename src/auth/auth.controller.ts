@@ -17,7 +17,7 @@ import { PasswordService } from 'src/password';
 import * as bcrypt from 'bcrypt';
 import { SigninGuard } from './guards/signin.guard';
 import { SigninDto } from './dto/signin.dto';
-import { User } from '@prisma/client';
+import { Roles, User } from '@prisma/client';
 import { TokenService } from 'src/token';
 import { IAuthResponse } from './interfaces/auth.interfaces';
 
@@ -40,7 +40,7 @@ export class AuthController {
       await this.tokenService.generateTokens(body.email);
 
     const user = await this.userService.findOne({
-      email: body.email,
+      where: { email: body.email },
     });
 
     await this.tokenService.saveRefreshToken({
@@ -73,9 +73,9 @@ export class AuthController {
     );
 
     const user = await this.userService.createOne({
-      email,
-      role: 'USER',
+      role: Roles.USER,
       password: hashedPassword,
+      email,
       salt,
     });
 
@@ -96,5 +96,4 @@ export class AuthController {
       id: user.id,
     };
   }
-
 }

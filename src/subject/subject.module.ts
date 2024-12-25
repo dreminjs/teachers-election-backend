@@ -10,6 +10,6 @@ import { UserModule } from 'src/user';
 @Module({
   imports: [PrismaModule, AuthModule, ConfigModule, UserModule],
   controllers: [SubjectController],
-  providers: [SubjectService,SubjectGuard],
+  providers: [SubjectService, SubjectGuard],
 })
 export class SubjectModule {}

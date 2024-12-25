@@ -27,7 +27,7 @@ export class SubjectService {
     return await this.prisma.subject.update({ where, data: dto });
   }
 
-  public async deleteOne(where: Prisma.SubjectWhereUniqueInput) {
-    return await this.prisma.subject.delete({ where });
+  public async deleteOne(where: Prisma.SubjectWhereUniqueInput): Promise<void> {
+    await this.prisma.subject.delete({ where });
   }
 }
