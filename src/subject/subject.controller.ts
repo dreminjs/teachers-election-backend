@@ -32,6 +32,7 @@ export class SubjectController {
       const subjects = await this.subjectService.findMany({
         skip: cursor,
         take: limit,
+        orderBy: { id: 'desc' } as Prisma.SubjectOrderByWithRelationInput
       });
 
       return {
