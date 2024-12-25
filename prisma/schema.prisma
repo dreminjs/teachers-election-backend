@@ -58,8 +58,8 @@ model Like {
 model Subject {
   id        String    @id @default(uuid())
   title     String
-  Teacher   Teacher[]
   createdAt DateTime  @default(now())
+  Teacher   Teacher[]
 }
 
 enum Roles {
