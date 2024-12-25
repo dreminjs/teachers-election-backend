@@ -12,6 +12,7 @@ import {
 import { SubjectService } from './subject.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { ISubjectsResponse } from './interfaces/subject.interfaces';
+import { Prisma } from '@prisma/client';
 
 @Controller('subject')
 export class SubjectController {
@@ -31,7 +32,7 @@ export class SubjectController {
       const subjects = await this.subjectService.findMany({
         skip: cursor,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: Prisma.SortOrder.desc},
       });
 
       return {
