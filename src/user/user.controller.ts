@@ -8,7 +8,7 @@ import { IUserRoleResponse } from './interfaces/user.interfaces';
 export class UserController {
 
   
-  @UseGuards(AccessTokenGuard)
+
   @Get('role')
   async findUserRole(@CurrentUser() user: User): Promise<IUserRoleResponse> {
     return { role: user.role, userId: user.id };
