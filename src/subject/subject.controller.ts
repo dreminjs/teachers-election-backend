@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   ParseIntPipe,
   Post,
@@ -17,6 +18,8 @@ import { Prisma } from '@prisma/client';
 @Controller('subject')
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}
+
+  private logger = new Logger(SubjectController.name);
 
   @Post()
   public async createOne(@Body() dto: CreateSubjectDto) {
@@ -34,6 +37,9 @@ export class SubjectController {
         take: limit,
         orderBy: { id: 'desc' } as Prisma.SubjectOrderByWithRelationInput
       });
+
+    
+      this.logger.log(subjects);
 
       return {
         data: subjects,

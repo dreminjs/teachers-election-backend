@@ -58,7 +58,7 @@ model Like {
 model Subject {
   id        String    @id @default(uuid())
   title     String
-  createdAt DateTime  @default(now())
+  createdAt DateTime  @default(now()) 
   Teacher   Teacher[]
 }
 
