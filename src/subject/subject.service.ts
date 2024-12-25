@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Prisma, Subject } from '@prisma/client';
 import { PrismaService } from 'src/prisma';
 
 @Injectable()
 export class SubjectService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private logger = new Logger(SubjectService.name);
 
   public async findMany(args: Prisma.SubjectFindManyArgs): Promise<Subject[]> {
     return await this.prisma.subject.findMany(args);
@@ -20,7 +22,7 @@ export class SubjectService {
 
   public async updateOne(
     where: Prisma.SubjectWhereUniqueInput,
-    dto: Prisma.SubjectUpdateInput
+    dto: Prisma.SubjectUpdateInput,
   ) {
     return await this.prisma.subject.update({ where, data: dto });
   }
