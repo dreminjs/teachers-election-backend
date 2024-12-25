@@ -9,12 +9,16 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { SubjectService } from './subject.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { ISubjectsResponse } from './interfaces/subject.interfaces';
 import { Prisma } from '@prisma/client';
+import { AccessTokenStrategy } from 'src/auth/strategies/access-token.strategy';
+import { SubjectGuard } from './guards/subject.guard';
 
+@UseGuards(AccessTokenStrategy)
 @Controller('subject')
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}
@@ -35,10 +39,9 @@ export class SubjectController {
       const subjects = await this.subjectService.findMany({
         skip: cursor,
         take: limit,
-        orderBy: { id: 'desc' } as Prisma.SubjectOrderByWithRelationInput
+        orderBy: { id: 'desc' } as Prisma.SubjectOrderByWithRelationInput,
       });
 
-    
       this.logger.log(subjects);
 
       return {
@@ -48,11 +51,13 @@ export class SubjectController {
     }
   }
 
+  @UseGuards(SubjectGuard)
   @Delete(':id')
-  public async deleteOne(@Param('id') id: string) {
-    return await this.subjectService.deleteOne({ id });
+  public async deleteOne(@Param('id') id: string): Promise<void> {
+    await this.subjectService.deleteOne({ id });
   }
 
+  @UseGuards(SubjectGuard)
   @Put(':id')
   public async updateOne(
     @Param('id') id: string,
