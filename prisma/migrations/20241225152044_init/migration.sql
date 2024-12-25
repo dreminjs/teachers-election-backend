@@ -59,6 +59,7 @@ CREATE TABLE "Like" (
 CREATE TABLE "Subject" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Subject_pkey" PRIMARY KEY ("id")
 );
