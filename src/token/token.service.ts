@@ -13,12 +13,14 @@ export class TokenService {
   ) {}
 
   async generateTokens(email: string): Promise<ITokens> {
-    const refreshToken = this.jwtService.sign(email, {
+    const refreshToken = this.jwtService.sign({ email }, {
       secret: this.configService.get('REFRESH_TOKEN_SECRET'),
+      expiresIn: '7d',
     });
 
-    const accessToken = this.jwtService.sign(email, {
+    const accessToken = this.jwtService.sign({ email }, {
       secret: this.configService.get('ACCESS_TOKEN_SECRET'),
+      expiresIn: '1d',
     });
 
     return { accessToken, refreshToken };

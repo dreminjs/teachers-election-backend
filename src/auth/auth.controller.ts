@@ -74,7 +74,7 @@ export class AuthController {
 
     const user = await this.userService.createOne({
       email,
-      role: 'User',
+      role: 'USER',
       password: hashedPassword,
       salt,
     });

@@ -14,11 +14,12 @@ import {
 import { SubjectService } from './subject.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { ISubjectsResponse } from './interfaces/subject.interfaces';
-import { Prisma } from '@prisma/client';
-import { AccessTokenStrategy } from 'src/auth/strategies/access-token.strategy';
+import { Prisma, Roles } from '@prisma/client';
 import { SubjectGuard } from './guards/subject.guard';
+import { AllowedRoles, RolesGuard } from 'src/user';
+import { AccessTokenGuard } from 'src/auth';
 
-@UseGuards(AccessTokenStrategy)
+@UseGuards(AccessTokenGuard)
 @Controller('subject')
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}
@@ -26,6 +27,8 @@ export class SubjectController {
   private logger = new Logger(SubjectController.name);
 
   @Post()
+  @UseGuards(RolesGuard)
+  @AllowedRoles(Roles.ADMIN)
   public async createOne(@Body() dto: CreateSubjectDto) {
     return await this.subjectService.createOne(dto);
   }
@@ -42,8 +45,6 @@ export class SubjectController {
         orderBy: { id: 'desc' } as Prisma.SubjectOrderByWithRelationInput,
       });
 
-      this.logger.log(subjects);
-
       return {
         data: subjects,
         nextCursor: subjects.length < limit ? null : cursor + limit,
@@ -52,12 +53,14 @@ export class SubjectController {
   }
 
   @UseGuards(SubjectGuard)
+  @AllowedRoles(Roles.ADMIN)
   @Delete(':id')
   public async deleteOne(@Param('id') id: string): Promise<void> {
     await this.subjectService.deleteOne({ id });
   }
 
   @UseGuards(SubjectGuard)
+  @AllowedRoles(Roles.ADMIN)
   @Put(':id')
   public async updateOne(
     @Param('id') id: string,

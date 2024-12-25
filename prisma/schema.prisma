@@ -63,6 +63,6 @@ model Subject {
 }
 
 enum Roles {
-  Role
-  User
+  ADMIN
+  USER
 }

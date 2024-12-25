@@ -4,9 +4,12 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from 'src/prisma';
 
-
 @Module({
-  imports: [ConfigModule,JwtModule.register({}), PrismaModule],
+  imports: [
+    ConfigModule,
+    JwtModule.register({ signOptions: { expiresIn: '1d' } }),
+    PrismaModule,
+  ],
   providers: [TokenService],
   exports: [TokenService],
 })
