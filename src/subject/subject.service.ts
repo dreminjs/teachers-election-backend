@@ -9,7 +9,7 @@ export class SubjectService {
   private logger = new Logger(SubjectService.name);
 
   public async findMany(args: Prisma.SubjectFindManyArgs): Promise<Subject[]> {
-    return await this.prisma.subject.findMany(args);
+    return await this.prisma.subject.findMany({ ...args, orderBy: { createdAt: 'desc' } });
   }
 
   public async findOne(args: Prisma.SubjectFindManyArgs) {
