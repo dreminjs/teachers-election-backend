@@ -28,7 +28,7 @@ model User {
 
 model TeacherReview {
   id           String  @id @default(uuid())
-  message      String? 
+  message      String?
   isChecked    Boolean
   freebie      Int
   friendliness Int
@@ -56,9 +56,10 @@ model Like {
 }
 
 model Subject {
-  id      String    @id @default(uuid())
-  title   String
-  Teacher Teacher[]
+  id        String    @id @default(uuid())
+  title     String
+  Teacher   Teacher[]
+  createdAt DateTime  @default(now())
 }
 
 enum Roles {

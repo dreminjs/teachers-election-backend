@@ -31,6 +31,7 @@ export class SubjectController {
       const subjects = await this.subjectService.findMany({
         skip: cursor,
         take: limit,
+        orderBy: { createdAt: 'desc' },
       });
 
       return {
