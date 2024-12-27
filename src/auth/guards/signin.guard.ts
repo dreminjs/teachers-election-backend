@@ -16,7 +16,7 @@ export class SigninGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const { email, password } = context.switchToHttp().getRequest();
+    const { email, password } = context.switchToHttp().getRequest().body
 
     const user = await this.userService.findOne({ where: { email } });
 
