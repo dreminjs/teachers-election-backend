@@ -3,30 +3,42 @@ import { ITokens } from './interfaces/tokens.interface';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma';
+import { UserService } from 'src/user';
 
 @Injectable()
 export class TokenService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
+    private readonly userService: UserService
   ) {}
 
   async generateTokens(email: string): Promise<ITokens> {
-    const refreshToken = this.jwtService.sign({ email }, {
-      secret: this.configService.get('REFRESH_TOKEN_SECRET'),
-      expiresIn: '7d',
-    });
+    const refreshToken = this.jwtService.sign(
+      { email },
+      {
+        secret: this.configService.get('REFRESH_TOKEN_SECRET'),
+        expiresIn: '7d',
+      }
+    );
 
-    const accessToken = this.jwtService.sign({ email }, {
-      secret: this.configService.get('ACCESS_TOKEN_SECRET'),
-      expiresIn: '1d',
-    });
+    const accessToken = this.jwtService.sign(
+      { email },
+      {
+        secret: this.configService.get('ACCESS_TOKEN_SECRET'),
+        expiresIn: '1d',
+      }
+    );
+
+    const { id: userId } = await this.userService.findOne({ where: { email } });
+
+    await this.saveRefreshToken({ userId, token: refreshToken });
 
     return { accessToken, refreshToken };
   }
 
-  async saveRefreshToken({
+  private async saveRefreshToken({
     userId,
     token,
   }: {

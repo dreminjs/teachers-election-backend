@@ -20,6 +20,7 @@ import { SigninDto } from './dto/signin.dto';
 import { Roles, User } from '@prisma/client';
 import { TokenService } from 'src/token';
 import { IAuthResponse } from './interfaces/auth.interfaces';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -34,7 +35,7 @@ export class AuthController {
   @Post('signin')
   async signin(
     @Body() body: SigninDto,
-    @Res({ passthrough: true }) res
+    @Res({ passthrough: true }) res: Response
   ): Promise<IAuthResponse> {
     const { accessToken, refreshToken } =
       await this.tokenService.generateTokens(body.email);
@@ -43,14 +44,17 @@ export class AuthController {
       where: { email: body.email },
     });
 
-    await this.tokenService.saveRefreshToken({
-      userId: user.id,
-      token: refreshToken,
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: 'lax',
     });
 
-    res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
-
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: 'lax',
+    });
 
     return {
       email: user.email,
@@ -63,7 +67,7 @@ export class AuthController {
   @Post('signup')
   async signup(
     @Body() { email, password }: SignupDto,
-    @Res({ passthrough: true }) res
+    @Res({ passthrough: true }) res: Response
   ): Promise<IAuthResponse> {
     const salt = await bcrypt.genSalt(6);
 
@@ -82,14 +86,12 @@ export class AuthController {
     const { accessToken, refreshToken } =
       await this.tokenService.generateTokens(email);
 
-    await this.tokenService.saveRefreshToken({
-      userId: user.id,
-      token: refreshToken,
+    res.cookie('accessToken', accessToken, { httpOnly: true, sameSite: 'lax' });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      sameSite: 'lax',
     });
-
-    res.cookie('accessToken', accessToken, { httpOnly: true });
-
-    res.cookie('refreshToken', refreshToken, { httpOnly: true });
 
     return {
       email: user.email,

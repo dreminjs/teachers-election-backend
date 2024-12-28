@@ -3,6 +3,7 @@ import { TokenService } from './token.service';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from 'src/prisma';
+import { TokenController } from './token.controller';
 
 @Module({
   imports: [
@@ -12,5 +13,6 @@ import { PrismaModule } from 'src/prisma';
   ],
   providers: [TokenService],
   exports: [TokenService],
+  controllers: [TokenController],
 })
 export class TokenModule {}
