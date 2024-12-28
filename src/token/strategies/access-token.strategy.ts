@@ -4,6 +4,8 @@ import { User } from 'prisma/prisma-client';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, Logger } from '@nestjs/common';
 import { UserService } from 'src/user';
+import { Request } from 'express';
+
 
 @Injectable()
 export class AccessTokenStrategy extends PassportStrategy(
@@ -18,7 +20,7 @@ export class AccessTokenStrategy extends PassportStrategy(
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (req) => {
+        (req: Request) => {
           let token = null;
           if (req && req.cookies) {
             token = req.cookies['accessToken'];
@@ -33,8 +35,6 @@ export class AccessTokenStrategy extends PassportStrategy(
   }
 
   async validate({ email }: { email: string }): Promise<User | null> {
-    const user = await this.userService.findOne({ where: { email } });
-
-    return user;
+    return await this.userService.findOne({ where: { email } });
   }
 }

@@ -5,9 +5,9 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { UserModule } from 'src/user/';
 import { PasswordModule } from 'src/password';
 import { TokenModule } from 'src/token';
-import { AccessTokenStrategy } from './strategies/access-token.strategy';
+import { AccessTokenStrategy } from '../token/strategies/access-token.strategy';
 import { ConfigModule } from '@nestjs/config';
-import { AccessTokenGuard } from './guards/access-token.guard';
+import { AccessTokenGuard } from '../token/guards/access-token.guard';
 
 @Module({
   imports: [
