@@ -25,6 +25,7 @@ export class AccessTokenStrategy extends PassportStrategy(
           if (req && req.cookies) {
             token = req.cookies['accessToken'];
             this.logger.log(`User has been validated`);
+            this.logger.log(token);
           }
           return token;
         },
@@ -35,6 +36,7 @@ export class AccessTokenStrategy extends PassportStrategy(
   }
 
   async validate({ email }: { email: string }): Promise<User | null> {
+    this.logger.log("email ",email)
     return await this.userService.findOne({ where: { email } });
   }
 }
