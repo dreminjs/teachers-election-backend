@@ -10,6 +10,7 @@ import {
   Post,
   Query,
   UploadedFile,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { TeacherService } from './teacher.service';
@@ -22,7 +23,10 @@ import {
 } from 'src/shared';
 import { GetTeachersQueryParameters } from './query-parameters/get-teacher.query-parameters';
 import { ITeacherExtendedResponse } from 'src/shared/interfaces/teacher.interface';
+import { AccessTokenGuard } from 'src/token';
 
+
+@UseGuards(AccessTokenGuard)
 @Controller('teacher')
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
