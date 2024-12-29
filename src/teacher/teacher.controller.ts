@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Logger,
   Param,
   Post,
   Query,
@@ -13,11 +14,20 @@ import {
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { TeacherService } from './teacher.service';
 import { Teacher } from '@prisma/client';
-import { generateRandomString } from 'src/shared';
+
+import {
+  generateRandomString,
+  IInfiniteScrollResponse,
+  ITeacherExtended,
+} from 'src/shared';
+import { GetTeachersQueryParameters } from './query-parameters/get-teacher.query-parameters';
+import { ITeacherExtendedResponse } from 'src/shared/interfaces/teacher.interface';
 
 @Controller('teacher')
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
+
+  private logger = new Logger(TeacherController.name);
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
@@ -40,15 +50,46 @@ export class TeacherController {
 
   @Get()
   async findMany(
-    @Query('take') take: number,
-    @Query('page') page: number,
-    @Query('search') search: string
-  ): Promise<Teacher[]> {
-    return await this.teacherService.findMany({
-      take: 100,
-      where: search ? { fullName: { contains: search } } : {},
-      skip: (page - 1) * take,
-    });
+    @Query()
+    {
+      cursor,
+      limit,
+      search,
+      subjectIds,
+      thresholdRating,
+      rating,
+    }: GetTeachersQueryParameters
+  ): Promise<IInfiniteScrollResponse<ITeacherExtendedResponse>> {
+    const teachers = (await this.teacherService.findMany({
+      take: limit,
+      where: {
+        ...(search ? { fullName: { contains: search } } : {}),
+        ...(subjectIds ? { subjectId: { in: subjectIds } } : {}),
+        ...(thresholdRating
+          ? { teacherReview: { some: { grade: { gte: thresholdRating } } } }
+          : {}),
+        ...(rating ? { teacherReview: { some: { grade: rating } } } : {}),
+      },
+      include: {
+        subject: {
+          select: {
+            title: true,
+          },
+        },
+      },
+      skip: cursor,
+    })) as ITeacherExtended[];
+
+    const nextCursor = teachers.length < limit ? null : cursor + limit;
+
+    return {
+      data: teachers.map((teacher) => ({
+        ...teacher,
+        subject: teacher.subject.title,
+        subjectId: undefined
+      })),
+      nextCursor,
+    };
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)

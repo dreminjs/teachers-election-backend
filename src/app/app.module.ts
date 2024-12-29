@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UserModule } from '../user/';
-import { AppController } from '../app/app.controller';
+
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuthModule } from '../auth';
 import { PasswordModule } from 'src/password';
@@ -22,9 +22,8 @@ import { SubjectModule } from 'src/subject';
     TeacherModule,
     TeacherReviewModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..',"..", "images"),
+      rootPath: join(__dirname, '..', '..', '..', 'images'),
     }),
   ],
-  controllers: [AppController],
 })
 export class AppModule {}

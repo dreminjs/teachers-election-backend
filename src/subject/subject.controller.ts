@@ -18,6 +18,7 @@ import { Prisma, Roles } from '@prisma/client';
 import { SubjectGuard } from './guards/subject.guard';
 import { AllowedRoles, RolesGuard } from 'src/user';
 import { AccessTokenGuard } from 'src/auth';
+import { InfiniteScrollQueryParameters } from 'src/shared';
 
 @UseGuards(AccessTokenGuard)
 @Controller('subject')
@@ -33,8 +34,7 @@ export class SubjectController {
 
   @Get()
   public async findMany(
-    @Query('cursor', ParseIntPipe) cursor: number,
-    @Query('limit', ParseIntPipe) limit: number
+    @Query() { cursor, limit }: InfiniteScrollQueryParameters
   ): Promise<ISubjectsResponse> {
     {
       const subjects = await this.subjectService.findMany({

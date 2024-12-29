@@ -20,4 +20,8 @@ export class CreateTeacherReviewDto {
   @IsInt()
   @Type(() => Number)
   smartless: number;
+
+
+  @IsString()
+  teacherId: string;
 }

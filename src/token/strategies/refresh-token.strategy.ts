@@ -7,9 +7,9 @@ import { UserService } from 'src/user';
 import { Request } from 'express';
 
 @Injectable()
-export class AccessTokenStrategy extends PassportStrategy(
+export class RefreshTokenStrategy extends PassportStrategy(
   Strategy,
-  'AccessTokenStrategy'
+  'RefreshTokenStrategy'
 ) {
 
   constructor(

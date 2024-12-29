@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { TeacherReviewService } from './teacher-review.service';
 import { CreateTeacherReviewDto } from './dto/create-teacher-review.dto';
-import { AccessTokenGuard } from 'src/auth';
+import { AccessTokenGuard } from 'src/token';
 import { TeacherReview, User } from '@prisma/client';
 import { CurrentUser } from 'src/user';
 
@@ -21,13 +21,16 @@ export class TeacherReviewController {
 
   @Post()
   async createOne(
+    @CurrentUser() { id: userId }: User,
     @Body() body: CreateTeacherReviewDto,
-    @CurrentUser() { id: userId }: User
   ): Promise<TeacherReview> {
     return this.teacherReviewService.createOne({
       ...body,
       user: { connect: { id: userId } },
       isChecked: false,
+      teacher: {
+        connect: { id: body.teacherId },
+      }
     });
   }
 

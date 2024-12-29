@@ -8,16 +8,17 @@ datasource db {
 }
 
 model Teacher {
-  id        String  @id @default(uuid())
-  fullName  String
-  photo     String
-  subjectId String
-  subject   Subject @relation(fields: [subjectId], references: [id])
+  id            String          @id @default(uuid())
+  fullName      String
+  photo         String
+  subjectId     String
+  subject       Subject         @relation(fields: [subjectId], references: [id])
+  teacherReview TeacherReview[]
 }
 
 model User {
   id            String          @id @default(uuid())
-  role          Roles           
+  role          Roles
   email         String          @unique
   salt          String
   password      String
@@ -30,6 +31,7 @@ model TeacherReview {
   id           String  @id @default(uuid())
   message      String?
   isChecked    Boolean
+  grade        Int     @default(0)
   freebie      Int
   friendliness Int
   experienced  Int
@@ -38,6 +40,8 @@ model TeacherReview {
   userId       String
   Like         Like[]
   user         User    @relation(fields: [userId], references: [id])
+  teacher      Teacher @relation(fields: [teacherId], references: [id])
+  teacherId    String
 }
 
 model RefreshToken {
@@ -58,8 +62,8 @@ model Like {
 model Subject {
   id        String    @id @default(uuid())
   title     String
-  createdAt DateTime  @default(now()) 
-  Teacher   Teacher[]
+  createdAt DateTime  @default(now())
+  teacher   Teacher[]
 }
 
 enum Roles {

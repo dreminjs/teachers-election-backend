@@ -13,7 +13,7 @@ export class TeacherService {
   }
 
   async findMany(dto: Prisma.TeacherFindManyArgs): Promise<Teacher[]> {
-    return await this.prisma.teacher.findMany();
+    return await this.prisma.teacher.findMany({ ...dto });
   }
 
   async findOne(where: Prisma.TeacherWhereUniqueInput): Promise<Teacher> {
