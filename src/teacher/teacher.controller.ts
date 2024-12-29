@@ -76,17 +76,26 @@ export class TeacherController {
             title: true,
           },
         },
+        teacherReview: {
+          select: { grade: true },
+        },
       },
       skip: cursor,
     })) as ITeacherExtended[];
 
     const nextCursor = teachers.length < limit ? null : cursor + limit;
+    const calculateAverageRating = (reviews: { grade: number }[]) => {
+      const total = reviews.reduce((sum, review) => sum + review.grade, 0);
+      return reviews.length ? total / reviews.length : 0;
+    };
 
     return {
       data: teachers.map((teacher) => ({
         ...teacher,
         subject: teacher.subject.title,
-        subjectId: undefined
+        avgRating: calculateAverageRating(teacher.teacherReview),
+        subjectId: undefined,
+        teacherReview: undefined,
       })),
       nextCursor,
     };

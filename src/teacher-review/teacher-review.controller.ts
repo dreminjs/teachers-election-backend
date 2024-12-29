@@ -22,23 +22,29 @@ export class TeacherReviewController {
   @Post()
   async createOne(
     @CurrentUser() { id: userId }: User,
-    @Body() body: CreateTeacherReviewDto,
+    @Body() body: CreateTeacherReviewDto
   ): Promise<TeacherReview> {
     return this.teacherReviewService.createOne({
-      ...body,
+      freebie: body.freebie,
+      friendliness: body.friendliness,
+      experienced: body.experienced,
+      strictness: body.strictness,
+      smartless: body.smartless,
+      message: body.message,
       user: { connect: { id: userId } },
       isChecked: false,
+      grade: body.rating,
       teacher: {
         connect: { id: body.teacherId },
-      }
+      },
     });
   }
 
   @Get(':teacherId')
   async findMany(@Param('teacherId') teacherId: string) {
     return await this.teacherReviewService.findMany({
-      id: teacherId,
-      isChecked: true,
+      teacher: { id: teacherId },
+      isChecked: false,
     });
   }
 
