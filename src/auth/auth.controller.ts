@@ -91,6 +91,7 @@ export class AuthController {
       sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000,
       path: '/',
+      secure: true
     });
 
     res.cookie('refreshToken', refreshToken, {
@@ -98,6 +99,7 @@ export class AuthController {
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/',
+      secure: true
     });
 
     return {
