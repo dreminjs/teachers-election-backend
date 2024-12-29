@@ -86,7 +86,11 @@ export class AuthController {
     const { accessToken, refreshToken } =
       await this.tokenService.generateTokens(email);
 
-    res.cookie('accessToken', accessToken, { httpOnly: true, sameSite: 'none', maxAge: 24 * 60 * 60 * 1000 });
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      sameSite: 'none',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
