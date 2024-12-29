@@ -13,7 +13,7 @@ model Teacher {
   photo         String
   subjectId     String
   subject       Subject         @relation(fields: [subjectId], references: [id])
-  teacherReview TeacherReview[]
+  teacherReview TeacherReview[] 
 }
 
 model User {
@@ -40,7 +40,7 @@ model TeacherReview {
   userId       String
   Like         Like[]
   user         User    @relation(fields: [userId], references: [id])
-  teacher      Teacher @relation(fields: [teacherId], references: [id])
+  teacher      Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   teacherId    String
 }
 
