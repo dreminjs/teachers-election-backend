@@ -13,6 +13,6 @@ export class TeacherModule {
  configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(UploadPhotoMiddleware)
-      .forRoutes({ path: 'images', method: RequestMethod.POST });
+      .forRoutes({ path: '/teacher', method: RequestMethod.POST });
   }
 }

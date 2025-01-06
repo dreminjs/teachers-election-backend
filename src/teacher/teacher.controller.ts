@@ -9,13 +9,14 @@ import {
   Param,
   Post,
   Query,
-  UploadedFile,
+  Req,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { TeacherService } from './teacher.service';
 import { Teacher } from '@prisma/client';
-
+import { File } from '../shared';
 import {
   generateRandomString,
   IInfiniteScrollResponse,
@@ -24,7 +25,7 @@ import {
 import { GetTeachersQueryParameters } from './query-parameters/get-teacher.query-parameters';
 import { ITeacherExtendedResponse } from 'src/shared/interfaces/teacher.interface';
 import { AccessTokenGuard } from 'src/token';
-
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @UseGuards(AccessTokenGuard)
 @Controller('teacher')
@@ -35,20 +36,13 @@ export class TeacherController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  async createOne(
-    @Body() body: CreateTeacherDto,
-    @UploadedFile() file: Express.Multer.File
-  ): Promise<Teacher> {
-    const code = generateRandomString(7);
-
+  async createOne(@Body() body, @File() photo: string): Promise<Teacher> {
     return await this.teacherService.createOne({
       fullName: body.fullName,
       subject: {
-        connect: {
-          id: body.subjectId,
-        },
+        connect: { id: body.subjectId },
       },
-      photo: code,
+      photo,
     });
   }
 

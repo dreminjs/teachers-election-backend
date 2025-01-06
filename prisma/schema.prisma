@@ -11,9 +11,9 @@ model Teacher {
   id            String          @id @default(uuid())
   fullName      String
   photo         String
-  subjectId     String
-  subject       Subject         @relation(fields: [subjectId], references: [id])
-  teacherReview TeacherReview[] 
+  subject       Subject         @relation(fields: [subjectId], references: [id]) // Связь с Subject
+  subjectId     String          // Внешний ключ для Subject
+  teacherReview TeacherReview[]
 }
 
 model User {
@@ -37,16 +37,16 @@ model TeacherReview {
   experienced  Int
   strictness   Int
   smartless    Int
-  userId       String
   Like         Like[]
+  userId       String
   user         User    @relation(fields: [userId], references: [id])
   teacher      Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   teacherId    String
 }
 
 model RefreshToken {
-  token  String
   id     String @id @default(uuid())
+  token  String
   userId String
   user   User   @relation(fields: [userId], references: [id])
 }
@@ -63,7 +63,7 @@ model Subject {
   id        String    @id @default(uuid())
   title     String
   createdAt DateTime  @default(now())
-  teacher   Teacher[]
+  teacher   Teacher[] // Один предмет может быть у нескольких учителей
 }
 
 enum Roles {

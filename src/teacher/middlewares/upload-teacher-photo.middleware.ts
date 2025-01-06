@@ -1,14 +1,14 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import * as multer from 'multer';
-
+import * as path from 'path';
 
 @Injectable()
 export class UploadPhotoMiddleware implements NestMiddleware {
   private upload = multer({
     storage: multer.diskStorage({
       destination: (req, file, cb) => {
-        cb(null, './uploads'); // Путь к папке для сохранения файлов
+        cb(null, path.resolve(__dirname, '../../../images')); // Путь к папке для сохранения файлов
       },
       filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
