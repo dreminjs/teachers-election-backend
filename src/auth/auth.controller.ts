@@ -10,7 +10,6 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
 import { CurrentUser, UserService } from 'src/user/';
 import { SignupDto } from './dto/signup.dto';
 import { SignupGuard } from './guards/signup.guard';
@@ -114,8 +113,13 @@ export class AuthController {
   }
 
     @Delete('signout')
-    public async signout(@CurrentUser() user: User) : Promise<void> {
+    public async signout(@CurrentUser() user: User,@Res() res: Response) : Promise<void> {
+
+
         await this.tokenService.deleteOne({userId: user.id})
+
+        res.clearCookie("accessToken")
+        res.clearCookie("refreshToken")
      }
 
 }
