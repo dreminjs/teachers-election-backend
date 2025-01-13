@@ -113,8 +113,8 @@ export class AuthController {
     };
   }
 
-    @Delete('logout')
-    public async logout(@CurrentUser() user: User) : Promise<void> {
+    @Delete('signout')
+    public async signout(@CurrentUser() user: User) : Promise<void> {
         await this.tokenService.deleteOne({userId: user.id})
      }
 
