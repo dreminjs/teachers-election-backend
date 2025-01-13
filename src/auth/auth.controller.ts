@@ -18,7 +18,7 @@ import * as bcrypt from 'bcrypt';
 import { SigninGuard } from './guards/signin.guard';
 import { SigninDto } from './dto/signin.dto';
 import { Roles, User } from '@prisma/client';
-import { TokenService } from 'src/token';
+import { AccessTokenGuard, TokenService } from 'src/token';
 import { IAuthResponse } from './interfaces/auth.interfaces';
 import { Response } from 'express';
 
@@ -112,6 +112,8 @@ export class AuthController {
     };
   }
 
+
+    @UseGuards(AccessTokenGuard)
     @Delete('signout')
     public async signout(@CurrentUser() user: User,@Res() res: Response) : Promise<void> {
 
