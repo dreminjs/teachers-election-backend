@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma';
 import { UserService } from 'src/user';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class TokenService {
@@ -18,7 +19,7 @@ export class TokenService {
     const refreshToken = this.jwtService.sign(
       { email },
       {
-        secret: this.configService.get('REFRESH_TOKEN_SECRET'),
+        secret: 'REFRESH_TOKEN_SECRET',
         expiresIn: '7d',
       }
     );
@@ -26,7 +27,7 @@ export class TokenService {
     const accessToken = this.jwtService.sign(
       { email },
       {
-        secret: this.configService.get('ACCESS_TOKEN_SECRET'),
+        secret: 'ACCESS_TOKEN_SECRET',
         expiresIn: '1d',
       }
     );
@@ -58,7 +59,7 @@ export class TokenService {
   public async verifyToken(token: string): Promise<string | null> {
     try {
       const payload = await this.jwtService.verify(token, {
-        secret: this.configService.get('ACCESS_TOKEN_SECRET'),
+        secret: 'ACCESS_TOKEN_SECRET',
       });
 
       return payload;
@@ -70,4 +71,9 @@ export class TokenService {
   public async decodeToken(token: string): Promise<string> {
     return await this.jwtService.decode(token);
   }
+
+  public async deleteOne(where: Prisma.RefreshTokenWhereUniqueInput) : Promise<void> {
+    await this.prisma.refreshToken.delete({where})
+  }
+
 }

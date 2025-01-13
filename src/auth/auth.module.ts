@@ -1,5 +1,4 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { UserModule } from 'src/user/';
@@ -18,7 +17,7 @@ import { AccessTokenGuard } from '../token/guards/access-token.guard';
     forwardRef(() => UserModule),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AccessTokenStrategy,AccessTokenGuard],
+  providers: [AccessTokenStrategy,AccessTokenGuard],
   exports: [AccessTokenStrategy],
 })
 export class AuthModule {}

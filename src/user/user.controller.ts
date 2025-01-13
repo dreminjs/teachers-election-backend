@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from '@prisma/client';
-import { IUser, IUserRoleResponse } from './interfaces/user.interfaces';
+import { IUser } from './interfaces/user.interfaces';
 import { UserService } from './user.service';
 
 @UseGuards(AccessTokenGuard)

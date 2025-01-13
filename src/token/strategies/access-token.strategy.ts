@@ -31,12 +31,11 @@ export class AccessTokenStrategy extends PassportStrategy(
         },
       ]),
       ignoreExpiration: false,
-      secretOrKey: configService.get('ACCESS_TOKEN_SECRET'),
+      secretOrKey: 'ACCESS_TOKEN_SECRET',
     });
   }
 
   async validate({ email }: { email: string }): Promise<User | null> {
-    this.logger.log("email ",email)
     return await this.userService.findOne({ where: { email } });
   }
 }

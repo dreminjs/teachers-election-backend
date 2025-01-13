@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -10,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UserService } from 'src/user/';
+import { CurrentUser, UserService } from 'src/user/';
 import { SignupDto } from './dto/signup.dto';
 import { SignupGuard } from './guards/signup.guard';
 import { PasswordService } from 'src/password';
@@ -77,7 +78,7 @@ export class AuthController {
 
     const hashedPassword = await this.passwordService.hashPassword(
       password,
-      salt
+      salt 
     );
 
     const user = await this.userService.createOne({
@@ -111,4 +112,10 @@ export class AuthController {
       id: user.id,
     };
   }
+
+    @Delete('logout')
+    public async logout(@CurrentUser() user: User) : Promise<void> {
+        await this.tokenService.deleteOne({userId: user.id})
+     }
+
 }
