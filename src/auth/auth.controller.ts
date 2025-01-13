@@ -10,7 +10,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { CurrentUser, UserService } from 'src/user/';
+import { UserService } from 'src/user/';
 import { SignupDto } from './dto/signup.dto';
 import { SignupGuard } from './guards/signup.guard';
 import { PasswordService } from 'src/password';
@@ -21,6 +21,7 @@ import { Roles, User } from '@prisma/client';
 import { AccessTokenGuard, TokenService } from 'src/token';
 import { IAuthResponse } from './interfaces/auth.interfaces';
 import { Response } from 'express';
+import { CurrentUser } from 'src/user/decorators/current-user.decorator';
 
 @Controller('auth')
 export class AuthController {
