@@ -24,6 +24,17 @@ export class TeacherReviewController {
     @CurrentUser() { id: userId }: User,
     @Body() body: CreateTeacherReviewDto
   ): Promise<TeacherReview> {
+
+    const grades = [
+      body.freebie,
+      body.experienced,
+      body.friendliness,
+      body.smartless,
+      body.strictness,
+    ];
+
+    const averageGrade = grades.reduce((sum, value) => sum + value, 0) 
+
     return this.teacherReviewService.createOne({
       freebie: body.freebie,
       friendliness: body.friendliness,
@@ -33,7 +44,7 @@ export class TeacherReviewController {
       message: body.message,
       user: { connect: { id: userId } },
       isChecked: false,
-      grade: body.rating,
+      grade: averageGrade,
       teacher: {
         connect: { id: body.teacherId },
       },

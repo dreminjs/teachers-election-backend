@@ -45,10 +45,4 @@ export class CreateTeacherReviewDto {
 
   @IsString()
   teacherId: string;
-
-  @Min(1)
-  @Max(5)
-  @IsNumber()
-  @Type(() => Number)
-  rating: number;
 }
