@@ -113,16 +113,16 @@ export class AuthController {
     };
   }
 
-
+    @HttpCode(HttpStatus.OK)
     @UseGuards(AccessTokenGuard)
     @Delete('signout')
-    public async signout(@CurrentUser() user: User,@Res() res: Response) : Promise<void> {
-
-
+    public async signout(@CurrentUser() user: User,@Res() res: Response) : Promise<{message: string}> {
         await this.tokenService.deleteOne({userId: user.id})
-
         res.clearCookie("accessToken")
         res.clearCookie("refreshToken")
+        return {
+          message: "Success"
+        }
      }
 
 }
