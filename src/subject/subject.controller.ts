@@ -19,6 +19,7 @@ import { SubjectGuard } from './guards/subject.guard';
 import { AllowedRoles, RolesGuard } from 'src/user';
 import { AccessTokenGuard } from 'src/auth';
 import { InfiniteScrollQueryParameters } from 'src/shared';
+import { UpdateSubjectDto } from './dto/update-subject.dto';
 
 @UseGuards(AccessTokenGuard)
 @Controller('subject')
@@ -63,7 +64,7 @@ export class SubjectController {
   @Put(':id')
   public async updateOne(
     @Param('id') id: string,
-    @Body() dto: CreateSubjectDto
+    @Body() dto: UpdateSubjectDto
   ) {
     return await this.subjectService.updateOne({ id }, dto);
   }
