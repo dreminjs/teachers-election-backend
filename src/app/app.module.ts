@@ -11,6 +11,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { SubjectModule } from 'src/subject';
 
+console.log(join(__dirname, '..', '..', 'images'))
+
 @Module({
   imports: [
     SubjectModule,
