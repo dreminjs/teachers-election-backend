@@ -97,6 +97,11 @@ export class TeacherController {
     };
   }
 
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<Teacher> {
+    return await this.teacherService.findOne({ id });
+  }
+
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   async deleteOne(@Param('id') id: string): Promise<void> {
