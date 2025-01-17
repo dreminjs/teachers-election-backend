@@ -5,7 +5,9 @@ import {
   Get,
   Logger,
   Param,
+  ParseBoolPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { TeacherReviewService } from './teacher-review.service';
@@ -24,7 +26,6 @@ export class TeacherReviewController {
     @CurrentUser() { id: userId }: User,
     @Body() body: CreateTeacherReviewDto
   ): Promise<TeacherReview> {
-
     const grades = [
       body.freebie,
       body.experienced,
@@ -33,7 +34,7 @@ export class TeacherReviewController {
       body.strictness,
     ];
 
-    const averageGrade = grades.reduce((sum, value) => sum + value, 0) 
+    const averageGrade = grades.reduce((sum, value) => sum + value, 0);
 
     return this.teacherReviewService.createOne({
       freebie: body.freebie,
@@ -51,11 +52,14 @@ export class TeacherReviewController {
     });
   }
 
-  @Get(':teacherId')
-  async findMany(@Param('teacherId') teacherId: string) {
+  @Get()
+  async findMany(
+    @Query('teacherId') teacherId: string,
+    @Query('isChecked', ParseBoolPipe) isChecked?: boolean
+  ) {
     return await this.teacherReviewService.findMany({
       teacher: { id: teacherId },
-      isChecked: false,
+      isChecked: isChecked || false,
     });
   }
 
