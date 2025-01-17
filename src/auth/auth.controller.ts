@@ -49,7 +49,6 @@ export class AuthController {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
       sameSite: 'none',
-      path:"/",
       secure: true,
     });
 
@@ -57,7 +56,6 @@ export class AuthController {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
       sameSite: 'none',
-      path:"/",
       secure: true,
     });
 
@@ -78,7 +76,7 @@ export class AuthController {
 
     const hashedPassword = await this.passwordService.hashPassword(
       password,
-      salt 
+      salt
     );
 
     const user = await this.userService.createOne({
@@ -95,7 +93,6 @@ export class AuthController {
       httpOnly: true,
       sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000,
-      path: '/',
       secure: true,
     });
 
@@ -103,7 +100,6 @@ export class AuthController {
       httpOnly: true,
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/',
       secure: true,
     });
 
@@ -113,16 +109,18 @@ export class AuthController {
     };
   }
 
-    @HttpCode(HttpStatus.OK)
-    @UseGuards(AccessTokenGuard)
-    @Delete('signout')
-    public async signout(@CurrentUser() user: User,@Res({passthrough: true}) res: Response) : Promise<{message: string}> {
-        await this.tokenService.deleteOne({userId: user.id})
-        res.clearCookie("accessToken")
-        res.clearCookie("refreshToken")
-        return {
-          message: "Success"
-        }
-     }
-
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AccessTokenGuard)
+  @Delete('signout')
+  public async signout(
+    @CurrentUser() user: User,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<{ message: string }> {
+    await this.tokenService.deleteOne({ userId: user.id });
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    return {
+      message: 'Success',
+    };
+  }
 }

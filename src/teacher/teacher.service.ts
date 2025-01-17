@@ -7,9 +7,7 @@ export class TeacherService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createOne(dto: Prisma.TeacherCreateInput): Promise<Teacher> {
-    const teacher = await this.prisma.teacher.create({ data: dto });
-
-    return teacher;
+    return await this.prisma.teacher.create({ data: dto });
   }
 
   async findMany(dto: Prisma.TeacherFindManyArgs): Promise<Teacher[]> {

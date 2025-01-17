@@ -32,8 +32,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
 
-  private logger = new Logger(TeacherController.name);
-
   @HttpCode(HttpStatus.CREATED)
   @Post()
   async createOne(@Body() body, @File() photo: string): Promise<Teacher> {

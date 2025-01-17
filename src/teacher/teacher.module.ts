@@ -10,9 +10,11 @@ import { UploadPhotoMiddleware } from './middlewares/upload-teacher-photo.middle
   providers: [TeacherService],
 })
 export class TeacherModule {
- configure(consumer: MiddlewareConsumer) {
+  configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(UploadPhotoMiddleware)
-      .forRoutes({ path: '/teacher', method: RequestMethod.POST });
+      .forRoutes({ path: '/teacher', method: RequestMethod.POST })
+      .apply()
+      .forRoutes({ path: '/teacher', method: RequestMethod.PATCH });
   }
 }
