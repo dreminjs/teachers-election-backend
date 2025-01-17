@@ -99,7 +99,9 @@ export class TeacherController {
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Teacher> {
-    return await this.teacherService.findOne({ id });
+    return await this.teacherService.findOne({where:{id},select:{
+      subject:true
+    }});
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)

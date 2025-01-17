@@ -14,8 +14,8 @@ export class TeacherService {
     return await this.prisma.teacher.findMany({ ...dto });
   }
 
-  async findOne(where: Prisma.TeacherWhereUniqueInput): Promise<Teacher> {
-    return await this.prisma.teacher.findFirst({ where });
+  async findOne(args: Prisma.TeacherFindFirstArgs): Promise<Teacher> {
+    return await this.prisma.teacher.findFirst(args);
   }
 
   async updateOne(where: Prisma.TeacherWhereUniqueInput, dto: Prisma.TeacherUpdateInput): Promise<Teacher> {
