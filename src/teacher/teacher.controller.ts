@@ -18,7 +18,6 @@ import { TeacherService } from './teacher.service';
 import { Teacher } from '@prisma/client';
 import { File } from '../shared';
 import {
-  generateRandomString,
   IInfiniteScrollResponse,
   ITeacherExtended,
 } from 'src/shared';
@@ -101,13 +100,17 @@ export class TeacherController {
   async findOne(@Param('id') id: string): Promise<ITeacherExtended> {
     const teacher = (await this.teacherService.findOne({
       where: { id },
-      select: {
-        subject: true,
-        fullName: true,
-        id: true,
-        teacherReview: true,
+      include: {
+        subject: {
+          select: {
+            title: true,
+          },
+        },
+        teacherReview: {
+          select: { grade: true },
+        },
       },
-    })) as ITeacherExtended;
+    })) as ITeacherExtended
 
     return {
       fullName: teacher.fullName,
