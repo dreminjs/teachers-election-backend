@@ -7,14 +7,15 @@ import {
   Param,
   ParseBoolPipe,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
 import { TeacherReviewService } from './teacher-review.service';
 import { CreateTeacherReviewDto } from './dto/create-teacher-review.dto';
 import { AccessTokenGuard } from 'src/token';
-import { TeacherReview, User } from '@prisma/client';
-import { CurrentUser } from 'src/user';
+import { Roles, Teacher, TeacherReview, User } from '@prisma/client';
+import { AllowedRoles, CurrentUser, RolesGuard } from 'src/user';
 import { GetTeacherReviewsQueryParameters } from './query-parameters/get-teacher-reviews.query-parameters';
 import { IInfiniteScrollResponse } from 'src/shared';
 
@@ -79,5 +80,21 @@ export class TeacherReviewController {
   @Delete(':id')
   async deleteOne(@Param('id') id: string): Promise<void> {
     await this.teacherReviewService.deleteOne({ id });
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @UseGuards(RolesGuard)
+  @AllowedRoles(Roles.ADMIN)
+  @Put('/aprove/:id')
+  async aprove(@Param("id") id: string): Promise<TeacherReview> {
+    return await this.teacherReviewService.updateOne({id},{isChecked: true})
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @UseGuards(RolesGuard)
+  @AllowedRoles(Roles.ADMIN)
+  @Put('/unaprove/:id')
+  async unaprove(@Param("id") id: string): Promise<TeacherReview> {
+    return await this.teacherReviewService.updateOne({id},{isChecked: false})
   }
 }
