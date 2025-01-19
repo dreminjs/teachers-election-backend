@@ -13,11 +13,27 @@ export class TokenController {
   constructor(private readonly tokenService: TokenService) {}
 
   @Get()
-  public async index(@CurrentUser() { email }: User,@Res({passthrough: true}) res: Response): Promise<ITokens> {
-  const tokens = await this.tokenService.generateTokens(email);
-  
-  
+  public async index(
+    @CurrentUser() { email }: User,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<ITokens> {
+    const { accessToken, refreshToken } =
+      await this.tokenService.generateTokens(email);
 
-  return tokens
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000,
+      secure: true,
+    });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      secure: true,
+    });
+
+    return { accessToken, refreshToken };
   }
 }
