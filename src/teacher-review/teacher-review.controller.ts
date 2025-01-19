@@ -15,6 +15,8 @@ import { CreateTeacherReviewDto } from './dto/create-teacher-review.dto';
 import { AccessTokenGuard } from 'src/token';
 import { TeacherReview, User } from '@prisma/client';
 import { CurrentUser } from 'src/user';
+import { GetTeacherReviewsQueryParameters } from './query-parameters/get-teacher-reviews.query-parameters';
+import { IInfiniteScrollResponse } from 'src/shared';
 
 @UseGuards(AccessTokenGuard)
 @Controller('teacher-review')
@@ -54,13 +56,24 @@ export class TeacherReviewController {
 
   @Get()
   async findMany(
-    @Query('teacherId') teacherId: string,
-    @Query('isChecked', ParseBoolPipe) isChecked?: boolean
-  ) {
-    return await this.teacherReviewService.findMany({
-      teacher: { id: teacherId },
-      isChecked: isChecked || false,
+    @Query()
+    { teacherId, isChecked, cursor, limit }: GetTeacherReviewsQueryParameters
+  ): Promise<IInfiniteScrollResponse<TeacherReview>> {
+    const teachersReviews = await this.teacherReviewService.findMany({
+      take: limit,
+      skip: cursor,
+      where: {
+        teacher: { id: teacherId },
+        isChecked: isChecked || false,
+      },
     });
+
+    const nextCursor = teachersReviews.length < limit ? null : cursor + limit;
+
+    return {
+      data: teachersReviews,
+      nextCursor,
+    };
   }
 
   @Delete(':id')

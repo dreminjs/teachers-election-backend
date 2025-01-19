@@ -11,8 +11,8 @@ export class TeacherReviewService {
     return await this.prisma.teacherReview.create({ data: dto })
   }
 
-  async findMany(dto: Prisma.TeacherReviewWhereInput) {
-    return await this.prisma.teacherReview.findMany({ where: dto });
+  async findMany(args: Prisma.TeacherReviewFindManyArgs) {
+    return await this.prisma.teacherReview.findMany(args);
   }
 
   async findOne(where: Prisma.TeacherReviewWhereUniqueInput) {
