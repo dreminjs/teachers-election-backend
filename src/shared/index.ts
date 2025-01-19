@@ -4,6 +4,4 @@ export { InfiniteScrollQueryParameters } from './query-parameters/infinite-scrol
 
 export { IInfiniteScrollResponse } from './interfaces/IInfinite-scroll-response';
 
-export { ITeacherExtended } from './interfaces/teacher.interface';
-
 export { File } from "./decorators/file.decorator";
