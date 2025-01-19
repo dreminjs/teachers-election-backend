@@ -1,13 +1,6 @@
 import { Subject } from '@prisma/client';
 import { Teacher } from '@prisma/client';
 
-export interface ITeacherResponse {
-  id: string;
-  fullName: string;
-  subject: Subject;
-  photo: string;
-  avgRating: number;
-}
 
 export interface ITeacherExtended extends Teacher {
   subject: Subject;
@@ -17,5 +10,7 @@ export interface ITeacherExtended extends Teacher {
 export interface ITeacherExtendedResponse {
   subject: string;
   avgRating: number;
-  teacherReview: undefined;
+  id: string
+  fullName: string
+  photo: string
 }

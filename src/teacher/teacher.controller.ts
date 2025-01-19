@@ -21,8 +21,7 @@ import { IInfiniteScrollResponse, ITeacherExtended } from 'src/shared';
 import { GetTeachersQueryParameters } from './query-parameters/get-teacher.query-parameters';
 import { AccessTokenGuard } from 'src/token';
 import { calculateAverageRating } from './model/calculateAvgRating';
-import {
-  ITeacherResponse,
+import type {
   ITeacherExtendedResponse,
 } from './teacher.interface';
 
@@ -93,7 +92,7 @@ export class TeacherController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ITeacherResponse> {
+  async findOne(@Param('id') id: string): Promise<ITeacherExtendedResponse> {
     const teacher = (await this.teacherService.findOne({
       where: { id },
       include: {
