@@ -16,10 +16,10 @@ export class UserController {
   }
 
   @Get('info')
-  public async info(@CurrentUser() user: User): Promise<IUser> {
+  public async info(@CurrentUser() { email, role }: User): Promise<IUser> {
     return {
-      email: user.email,
-      role: user.role,
+      email,
+      role,
     };
   }
 }
