@@ -17,11 +17,12 @@ import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { TeacherService } from './teacher.service';
 import { Teacher } from '@prisma/client';
 import { File } from '../shared';
-import { IInfiniteScrollResponse, ITeacherExtended } from 'src/shared';
+import { IInfiniteScrollResponse } from 'src/shared';
 import { GetTeachersQueryParameters } from './query-parameters/get-teacher.query-parameters';
 import { AccessTokenGuard } from 'src/token';
 import { calculateAverageRating } from './model/calculateAvgRating';
 import type {
+  ITeacherExtended,
   ITeacherExtendedResponse,
 } from './teacher.interface';
 
@@ -110,7 +111,7 @@ export class TeacherController {
     return {
       id: teacher.id,
       fullName: teacher.fullName,
-      subject: teacher.subject,
+      subject: teacher.subject.title,
       photo: teacher.photo,
       avgRating: calculateAverageRating(teacher.teacherReview),
     };
