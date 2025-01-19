@@ -25,6 +25,7 @@ import { GetTeachersQueryParameters } from './query-parameters/get-teacher.query
 import { ITeacherExtendedResponse } from 'src/shared/interfaces/teacher.interface';
 import { AccessTokenGuard } from 'src/token';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { calculateAverageRating } from './model/calculateAvgRating';
 
 @UseGuards(AccessTokenGuard)
 @Controller('teacher')
@@ -79,11 +80,7 @@ export class TeacherController {
     })) as ITeacherExtended[];
 
     const nextCursor = teachers.length < limit ? null : cursor + limit;
-    const calculateAverageRating = (reviews: { grade: number }[]) => {
-      const total = reviews.reduce((sum, review) => sum + review.grade, 0);
-      return reviews.length ? total / reviews.length : 0;
-    };
-
+    
     return {
       data: teachers.map((teacher) => ({
         ...teacher,
@@ -97,7 +94,7 @@ export class TeacherController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ITeacherExtended> {
+  async findOne(@Param('id') id: string): Promise<Omit<ITeacherExtended,"subjectId">> {
     const teacher = (await this.teacherService.findOne({
       where: { id },
       include: {
@@ -113,12 +110,11 @@ export class TeacherController {
     })) as ITeacherExtended
 
     return {
+      id: teacher.id,
       fullName: teacher.fullName,
       subject: teacher.subject,
-      id: teacher.id,
       photo: teacher.photo,
       teacherReview: teacher.teacherReview,
-      subjectId: teacher.subjectId,
     };
   }
 

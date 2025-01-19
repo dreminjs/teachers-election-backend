@@ -12,7 +12,7 @@ export class TokenController {
   constructor(private readonly tokenService: TokenService) {}
 
   @Get()
-  public async index(@CurrentUser() {email}: User): Promise<ITokens> {
+  public async index(@CurrentUser() { email }: User): Promise<ITokens> {
     return await this.tokenService.generateTokens(email);
   }
 }

@@ -5,15 +5,17 @@ import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from 'src/prisma';
 import { TokenController } from './token.controller';
 import { UserModule } from 'src/user';
+import { AccessTokenStrategy } from './strategies/access-token.strategy';
+import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 
 @Module({
   imports: [
     ConfigModule,
-    JwtModule.register({ signOptions: { expiresIn: '1d' } }),
+    JwtModule.register({}),
     PrismaModule,
     forwardRef(() => UserModule)
   ],
-  providers: [TokenService],
+  providers: [TokenService,AccessTokenStrategy,RefreshTokenStrategy],
   exports: [TokenService],
   controllers: [TokenController],
 })
