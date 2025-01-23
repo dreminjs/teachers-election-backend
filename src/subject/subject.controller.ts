@@ -51,9 +51,10 @@ export class SubjectController {
     }
   }
 
-  @UseGuards(RolesGuard)
+ 
   @UseGuards(SubjectGuard)
   @AllowedRoles(Roles.ADMIN)
+  @UseGuards(RolesGuard)
   @Delete(':id')
   public async deleteOne(@Param('id') id: string): Promise<void> {
     await this.subjectService.deleteOne({ id });
@@ -61,6 +62,7 @@ export class SubjectController {
 
   @UseGuards(SubjectGuard)
   @AllowedRoles(Roles.ADMIN)
+  @UseGuards(RolesGuard)
   @Put(':id')
   public async updateOne(
     @Param('id') id: string,

@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { TeacherService } from './teacher.service';
-import { Teacher } from '@prisma/client';
+import { Roles, Teacher } from '@prisma/client';
 import { File } from '../shared';
 import { IInfiniteScrollResponse } from 'src/shared';
 import { GetTeachersQueryParameters } from './query-parameters/get-teacher.query-parameters';
@@ -25,12 +25,16 @@ import type {
   ITeacherExtended,
   ITeacherExtendedResponse,
 } from './teacher.interface';
+import { AllowedRoles, RolesGuard } from 'src/user';
 
 @UseGuards(AccessTokenGuard)
 @Controller('teacher')
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
 
+
+  @AllowedRoles(Roles.ADMIN)
+  @UseGuards(RolesGuard)
   @HttpCode(HttpStatus.CREATED)
   @Post()
   async createOne(@Body() body, @File() photo: string): Promise<Teacher> {
