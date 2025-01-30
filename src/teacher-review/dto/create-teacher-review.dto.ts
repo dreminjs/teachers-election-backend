@@ -5,7 +5,9 @@ import {
   IsOptional,
   IsString,
   Max,
+  MaxLength,
   Min,
+  MinLength,
 } from 'class-validator';
 
 export class CreateTeacherReviewDto {
@@ -14,32 +16,32 @@ export class CreateTeacherReviewDto {
   message: string | null;
 
   @IsInt()
-  @Min(1)
-  @Max(5)
+  @MinLength(1)
+  @MaxLength(5)
   @Type(() => Number)
   freebie: number;
 
   @IsInt()
-  @Min(1)
-  @Max(5)
+  @MinLength(1)
+  @MaxLength(5)
   @Type(() => Number)
   friendliness: number;
 
   @IsInt()
-  @Min(1)
-  @Max(5)
+  @MinLength(1)
+  @MaxLength(5)
   @Type(() => Number)
   experienced: number;
 
   @IsInt()
-  @Min(1)
-  @Max(5)
+  @MinLength(1)
+  @MaxLength(5)
   @Type(() => Number)
   strictness: number;
 
   @IsInt()
-  @Min(1)
-  @Max(5)
+  @MinLength(1)
+  @MaxLength(5)
   @Type(() => Number)
   smartless: number;
 
