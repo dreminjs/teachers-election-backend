@@ -1,9 +1,10 @@
-import { Subject } from "@prisma/client";
+import { Type } from "class-transformer";
 
 
-
-
-export interface ISubjectsResponse {
-    data: Subject[]
-    nextCursor: number | null
+export class IGetSubjectsQueryParameters {
+    @Type(() => Number)
+    limit: number
+    @Type(() => Number)
+    page: number
+    title?: string
 }

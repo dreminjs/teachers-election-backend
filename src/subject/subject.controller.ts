@@ -13,13 +13,13 @@ import {
 } from '@nestjs/common';
 import { SubjectService } from './subject.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
-import { ISubjectsResponse } from './interfaces/subject.interfaces';
-import { Prisma, Roles } from '@prisma/client';
+import { Prisma, Roles, Subject } from '@prisma/client';
 import { SubjectGuard } from './guards/subject.guard';
 import { AllowedRoles, RolesGuard } from 'src/user';
 import { AccessTokenGuard } from 'src/auth';
-import { InfiniteScrollQueryParameters } from 'src/shared';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
+import { IWithPagination } from 'src/shared/interfaces/with-pagination';
+import { IGetSubjectsQueryParameters } from './interfaces/subject.interfaces';
 
 @UseGuards(AccessTokenGuard)
 @Controller('subject')
@@ -35,23 +35,31 @@ export class SubjectController {
 
   @Get()
   public async findMany(
-    @Query() { cursor, limit }: InfiniteScrollQueryParameters
-  ): Promise<ISubjectsResponse> {
-    {
-      const subjects = await this.subjectService.findMany({
-        skip: cursor,
+    @Query() { limit, page, title }: IGetSubjectsQueryParameters
+  ): Promise<IWithPagination<Subject>> {
+    const [items, count] = await Promise.all([
+      await this.subjectService.findMany({
+        skip: (page - 1) * limit,
         take: limit,
         orderBy: { id: 'desc' } as Prisma.SubjectOrderByWithRelationInput,
-      });
+        where: {
+          ...(title && { title: { contains: title } }),
+        },
+      }),
+      await this.subjectService.count({
+        where: {
+          ...(title && { title: { contains: title } }),
+        },
+      }),
+    ]);
 
-      return {
-        data: subjects,
-        nextCursor: subjects.length < limit ? null : cursor + limit,
-      };
-    }
+    return {
+      items,
+      count,
+      currentPage: page,
+    };
   }
 
- 
   @UseGuards(SubjectGuard)
   @AllowedRoles(Roles.ADMIN)
   @UseGuards(RolesGuard)
