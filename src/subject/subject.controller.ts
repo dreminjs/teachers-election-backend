@@ -20,6 +20,7 @@ import { AccessTokenGuard } from 'src/auth';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
 import { IWithPagination } from 'src/shared/interfaces/with-pagination';
 import { IGetSubjectsQueryParameters } from './interfaces/subject.interfaces';
+import { IInfiniteScrollResponse } from 'src/shared';
 
 @UseGuards(AccessTokenGuard)
 @Controller('subject')
@@ -35,11 +36,11 @@ export class SubjectController {
 
   @Get()
   public async findMany(
-    @Query() { limit, page, title }: IGetSubjectsQueryParameters
-  ): Promise<IWithPagination<Subject>> {
+    @Query() { limit, cursor, title, page }: IGetSubjectsQueryParameters
+  ): Promise<IWithPagination<Subject> | IInfiniteScrollResponse<Subject>> {
     const [items, count] = await Promise.all([
       await this.subjectService.findMany({
-        skip: (page - 1) * limit,
+        skip: page ? (page - 1) * limit : cursor,
         take: limit,
         orderBy: { id: 'desc' } as Prisma.SubjectOrderByWithRelationInput,
         where: {
@@ -53,11 +54,19 @@ export class SubjectController {
       }),
     ]);
 
-    return {
-      items,
-      count,
-      currentPage: page,
-    };
+    if (page) {
+      return {
+        items,
+        count,
+        currentPage: page,
+      };
+    } else {
+      const nextCursor = items.length < limit ? null : cursor + limit;
+      return {
+        nextCursor,
+        data: items,
+      };
+    }
   }
 
   @UseGuards(SubjectGuard)
