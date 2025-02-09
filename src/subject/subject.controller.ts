@@ -42,14 +42,14 @@ export class SubjectController {
       await this.subjectService.findMany({
         skip: page ? (page - 1) * limit : cursor,
         take: limit,
-        orderBy: { id: 'desc' } as Prisma.SubjectOrderByWithRelationInput,
+        orderBy: { createdAt: 'asc' } as Prisma.SubjectOrderByWithRelationInput,
         where: {
           ...(title && { title: { contains: title } }),
         },
       }),
       await this.subjectService.count({
         where: {
-          ...(title && { title: { contains: title } }),
+          ...(title ? { title: { contains: title } } : {}),
         },
       }),
     ]);
