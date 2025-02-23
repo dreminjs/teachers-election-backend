@@ -14,7 +14,7 @@ export class TokenController {
 
   @Get()
   public async index(
-    @CurrentUser() { email }: User,
+    @CurrentUser('email') email : string,
     @Res({ passthrough: true }) res: Response
   ): Promise<ITokens> {
     const { accessToken, refreshToken } =

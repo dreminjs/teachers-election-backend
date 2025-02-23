@@ -7,8 +7,6 @@ import { User } from '@prisma/client';
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
-  private logger = new Logger(RolesGuard.name);
-
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
       context.getHandler(),
@@ -16,8 +14,6 @@ export class RolesGuard implements CanActivate {
     ]);
 
     const user = context.switchToHttp().getRequest().user as User
-
-    this.logger.log(`User roles: ${user.role}`)
 
     const isAuthorized = requiredRoles.some((role) => user.role?.includes(role));
 

@@ -19,7 +19,7 @@ import { AllowedRoles, RolesGuard } from 'src/user';
 import { AccessTokenGuard } from 'src/auth';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
 import { IWithPagination } from 'src/shared/interfaces/with-pagination';
-import { IGetSubjectsQueryParameters } from './interfaces/subject.interfaces';
+import { IGetSubjectsQueryParameters } from './interfaces/iget-subjects-query-parameters';
 import { IInfiniteScrollResponse } from 'src/shared';
 
 @UseGuards(AccessTokenGuard)
@@ -27,8 +27,8 @@ import { IInfiniteScrollResponse } from 'src/shared';
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}
 
-  @Post()
   @UseGuards(RolesGuard)
+  @Post()
   @AllowedRoles(Roles.ADMIN)
   public async createOne(@Body() dto: CreateSubjectDto) {
     return await this.subjectService.createOne(dto);

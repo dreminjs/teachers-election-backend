@@ -11,7 +11,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get(':id')
-  public async findOne(@Query('id') id?: string): Promise<User> {
+  public async findOne(@Query('id') id: string): Promise<User> {
     return await this.userService.findOne({ where: { id: id } });
   }
 
