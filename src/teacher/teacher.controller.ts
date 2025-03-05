@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Logger,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -29,6 +30,7 @@ import { AllowedRoles, RolesGuard } from 'src/user';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MinioFileUploadInterceptor } from 'src/minio-client/minio-file-upload.interceptor';
 import { MinioFileName } from 'src/minio-client/minio-file-name.decorator';
+import { UpdateTeacherDto } from './dto/update-teacher.dto';
 
 @UseGuards(AccessTokenGuard)
 @Controller('teacher')
@@ -42,7 +44,6 @@ export class TeacherController {
   @Post()
   async createOne(
     @Body() body: CreateTeacherDto,
-    @File() photo: string,
     @MinioFileName() fileName: string
   ): Promise<Teacher> {
     return await this.teacherService.createOne({
@@ -52,6 +53,25 @@ export class TeacherController {
       },
       photo: fileName,
     });
+  }
+
+  @UseInterceptors(FileInterceptor('file'), MinioFileUploadInterceptor)
+  @AllowedRoles(Roles.ADMIN)
+  @UseGuards(RolesGuard)
+  @HttpCode(HttpStatus.CREATED)
+  @Patch(':id')
+  async updateOne(
+    @Body() { fullName }: UpdateTeacherDto,
+    @Param('id') id: string,
+    @MinioFileName() fileName?: string
+  ): Promise<Teacher> {
+    return await this.teacherService.updateOne(
+      { id },
+      {
+        ...(fullName ? { fullName: fullName } : {}),
+        ...(fileName ? { photo: fileName } : {}),
+      }
+    );
   }
 
   @Get()
