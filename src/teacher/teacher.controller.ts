@@ -26,24 +26,31 @@ import type {
   ITeacherExtendedResponse,
 } from './teacher.interface';
 import { AllowedRoles, RolesGuard } from 'src/user';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { MinioFileUploadInterceptor } from 'src/minio-client/minio-file-upload.interceptor';
+import { MinioFileName } from 'src/minio-client/minio-file-name.decorator';
 
 @UseGuards(AccessTokenGuard)
 @Controller('teacher')
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
 
-
+  @UseInterceptors(FileInterceptor('file'), MinioFileUploadInterceptor)
   @AllowedRoles(Roles.ADMIN)
   @UseGuards(RolesGuard)
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  async createOne(@Body() body, @File() photo: string): Promise<Teacher> {
+  async createOne(
+    @Body() body: CreateTeacherDto,
+    @File() photo: string,
+    @MinioFileName() fileName: string
+  ): Promise<Teacher> {
     return await this.teacherService.createOne({
       fullName: body.fullName,
       subject: {
         connect: { id: body.subjectId },
       },
-      photo,
+      photo: fileName,
     });
   }
 

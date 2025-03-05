@@ -41,10 +41,6 @@ export class AuthController {
     const { accessToken, refreshToken } =
       await this.tokenService.generateTokens(body.email);
 
-    const user = await this.userService.findOne({
-      where: { email: body.email },
-    });
-
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
@@ -60,8 +56,7 @@ export class AuthController {
     });
 
     return {
-      email: user.email,
-      id: user.id,
+      email: body.email,
     };
   }
 
@@ -74,29 +69,35 @@ export class AuthController {
   ): Promise<IAuthResponse> {
     const salt = await bcrypt.genSalt(6);
 
-    const hashedPassword = await this.passwordService.hashPassword(
+    const hashedPasswordQuery = this.passwordService.hashPassword(
       password,
       salt
     );
 
-    const user = await this.userService.createOne({
-      role: Roles.USER,
-      password: hashedPassword,
-      email,
-      salt,
-    });
+    const tokensQuery =
+      this.tokenService.generateTokens(email);
 
-    const { accessToken, refreshToken } =
-      await this.tokenService.generateTokens(email);
 
-    res.cookie('accessToken', accessToken, {
+      const [hashedPassword,tokens] = await Promise.all([
+        hashedPasswordQuery,
+        tokensQuery
+      ])
+
+      const user = await this.userService.createOne({
+        role: Roles.USER,
+        password: hashedPassword,
+        email,
+        salt,
+      });
+
+    res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
       sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000,
       secure: true,
     });
 
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -105,7 +106,6 @@ export class AuthController {
 
     return {
       email: user.email,
-      id: user.id,
     };
   }
 
@@ -113,10 +113,10 @@ export class AuthController {
   @UseGuards(AccessTokenGuard)
   @Delete('signout')
   public async signout(
-    @CurrentUser() user: User,
+    @CurrentUser("id") userId: string,
     @Res({ passthrough: true }) res: Response
   ): Promise<{ message: string }> {
-    await this.tokenService.deleteOne({ userId: user.id });
+    await this.tokenService.deleteOne({ userId });
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
     return {

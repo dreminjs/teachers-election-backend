@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { UserModule } from '../user/';
-
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuthModule } from '../auth';
 import { PasswordModule } from 'src/password';
@@ -10,8 +9,8 @@ import { TeacherReviewModule } from 'src/teacher-review';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { SubjectModule } from 'src/subject';
+import { MinioClientModule } from 'src/minio-client/minio-client.module';
 
-console.log(join(__dirname, '..', '..', 'images'))
 
 @Module({
   imports: [
@@ -23,6 +22,7 @@ console.log(join(__dirname, '..', '..', 'images'))
     ConfigModule,
     TeacherModule,
     TeacherReviewModule,
+    MinioClientModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'images'),
     }),
