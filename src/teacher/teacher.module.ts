@@ -1,20 +1,12 @@
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TeacherController } from './teacher.controller';
 import { TeacherService } from './teacher.service';
 import { PrismaModule } from 'src/prisma';
-import { UploadPhotoMiddleware } from './middlewares/upload-teacher-photo.middleware';
+import { MinioClientModule } from 'src/minio-client/minio-client.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule,MinioClientModule],
   controllers: [TeacherController],
   providers: [TeacherService],
 })
-export class TeacherModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(UploadPhotoMiddleware)
-      .forRoutes({ path: '/teacher', method: RequestMethod.POST })
-      .apply()
-      .forRoutes({ path: '/teacher', method: RequestMethod.PATCH });
-  }
-}
+export class TeacherModule {}

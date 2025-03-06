@@ -61,7 +61,7 @@ export class TeacherController {
   @HttpCode(HttpStatus.CREATED)
   @Patch(':id')
   async updateOne(
-    @Body() { fullName }: UpdateTeacherDto,
+    @Body() { fullName, subjectId }: UpdateTeacherDto,
     @Param('id') id: string,
     @MinioFileName() fileName?: string
   ): Promise<Teacher> {
@@ -70,6 +70,7 @@ export class TeacherController {
       {
         ...(fullName ? { fullName: fullName } : {}),
         ...(fileName ? { photo: fileName } : {}),
+        ...(subjectId ? { subjectId } : {}),
       }
     );
   }
