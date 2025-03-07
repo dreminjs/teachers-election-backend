@@ -1,25 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Readable } from 'stream';
-import * as crypto from "crypto"
+import * as crypto from 'crypto';
 import { BufferedFile } from './minio-client.interface';
-import * as Minio from 'minio'
+import * as Minio from 'minio';
 
 @Injectable()
 export class MinioClientService {
   constructor(
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
     // private readonly minioService: MinioService
   ) {}
 
-  public get client():  Minio.Client {
+  public get client(): Minio.Client {
     return new Minio.Client({
       endPoint: this.endpoint,
       port: this.port,
       useSSL: true,
       accessKey: this.accessKey,
-      secretKey: this.secrethKey
-    })
+      secretKey: this.secrethKey,
+    });
   }
 
   private readonly baseBucket = this.configService.get<string>('MINIO_BUCKET');
@@ -30,11 +30,17 @@ export class MinioClientService {
 
   private readonly bucket = this.configService.get<string>('MINIO_BUCKET');
 
-  private readonly accessKey = this.configService.get<string>("MINIO_ACCESS_KEY")
+  private readonly accessKey =
+    this.configService.get<string>('MINIO_ACCESS_KEY');
 
-  private readonly secrethKey = this.configService.get<string>("MINIO_SECRET_KEY")
+  private readonly secrethKey =
+    this.configService.get<string>('MINIO_SECRET_KEY');
 
-  public async uploadOne(file: BufferedFile) {
+  public async uploadOne(file: BufferedFile | null): Promise<{
+    url: string;
+    fileName: string;
+  } | null> {
+    if (!file) return null;
     const temp_filename = Date.now().toString();
     const hashedFileName = crypto
       .createHash('md5')
@@ -54,7 +60,7 @@ export class MinioClientService {
       fileName,
       file.buffer,
       null,
-      metaData,
+      metaData
     );
 
     return {
@@ -63,4 +69,3 @@ export class MinioClientService {
     };
   }
 }
-

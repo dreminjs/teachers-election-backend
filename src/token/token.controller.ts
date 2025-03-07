@@ -6,19 +6,25 @@ import { User } from '@prisma/client';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { CurrentUser } from 'src/user/decorators/current-user.decorator';
 import { Response } from 'express';
+import { UserService } from 'src/user';
 
 @UseGuards(RefreshTokenGuard)
 @Controller('token')
 export class TokenController {
-  constructor(private readonly tokenService: TokenService) {}
+  constructor(
+    private readonly tokenService: TokenService,
+    private readonly userService: UserService
+  ) {}
 
   @Get()
   public async index(
-    @CurrentUser('email') email : string,
+    @CurrentUser('email') email: string,
     @Res({ passthrough: true }) res: Response
   ): Promise<ITokens> {
+    const { id: userId } = await this.userService.findOne({ where: { email } });
+
     const { accessToken, refreshToken } =
-      await this.tokenService.generateTokens(email);
+      await this.tokenService.generateTokens({ userId, email });
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
