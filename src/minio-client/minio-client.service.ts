@@ -1,29 +1,38 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { MinioService, MinioClient } from 'nestjs-minio-client';
 import { Readable } from 'stream';
 import * as crypto from "crypto"
 import { BufferedFile } from './minio-client.interface';
-
+import * as Minio from 'minio'
 
 @Injectable()
 export class MinioClientService {
   constructor(
     private readonly configService: ConfigService,
-    private readonly minioService: MinioService
+    // private readonly minioService: MinioService
   ) {}
 
-  public get client(): MinioClient {
-    return this.minioService.client;
+  public get client():  Minio.Client {
+    return new Minio.Client({
+      endPoint: this.endpoint,
+      port: this.port,
+      useSSL: true,
+      accessKey: this.accessKey,
+      secretKey: this.secrethKey
+    })
   }
 
   private readonly baseBucket = this.configService.get<string>('MINIO_BUCKET');
 
-  private readonly minioPort = this.configService.get<string>('MINIO_PORT');
+  private readonly port = +this.configService.get<string>('MINIO_PORT');
 
-  private readonly minioEndpoint = this.configService.get<string>('MINIO_ENDPOINT');
+  private readonly endpoint = this.configService.get<string>('MINIO_ENDPOINT');
 
-  private readonly minioBucket = this.configService.get<string>('MINIO_BUCKET');
+  private readonly bucket = this.configService.get<string>('MINIO_BUCKET');
+
+  private readonly accessKey = this.configService.get<string>("MINIO_ACCESS_KEY")
+
+  private readonly secrethKey = this.configService.get<string>("MINIO_SECRET_KEY")
 
   public async uploadOne(file: BufferedFile) {
     const temp_filename = Date.now().toString();
@@ -46,26 +55,12 @@ export class MinioClientService {
       file.buffer,
       null,
       metaData,
-      function (err) {
-        if (err)
-          throw new HttpException(
-            `Error uploading file. Reason is ${err.message}`,
-            HttpStatus.BAD_REQUEST
-          );
-      }
     );
 
     return {
-      url: `${this.minioEndpoint}:${this.minioPort}/${this.minioBucket}/${fileName}`,
+      url: `${this.endpoint}:${this.port}/${this.bucket}/${fileName}`,
       fileName,
     };
-  }
-  async findBuffer(fileName: string): Promise<Readable> {
-    const fileBuffer = await this.minioService.client.getObject(
-      this.baseBucket,
-      fileName
-    );
-    return fileBuffer;
   }
 }
 

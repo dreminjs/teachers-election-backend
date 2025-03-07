@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { MinioClientService } from './minio-client.service';
-import { BufferedFile,CustomRequest } from './minio-client.interface';
+import { BufferedFile, CustomRequest } from './minio-client.interface';
 
 @Injectable()
 export class MinioFileUploadInterceptor implements NestInterceptor {
