@@ -31,11 +31,15 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { MinioFileUploadInterceptor } from 'src/minio-client/minio-file-upload.interceptor';
 import { MinioFileName } from 'src/minio-client/minio-file-name.decorator';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
+import { MinioClientService } from 'src/minio-client/minio-client.service';
 
 @UseGuards(AccessTokenGuard)
 @Controller('teachers')
 export class TeacherController {
-  constructor(private readonly teacherService: TeacherService) {}
+  constructor(
+    private readonly teacherService: TeacherService,
+    private readonly minioClientService: MinioClientService
+  ) {}
 
   @UseInterceptors(FileInterceptor('file'), MinioFileUploadInterceptor)
   @AllowedRoles(Roles.ADMIN)
@@ -65,6 +69,14 @@ export class TeacherController {
     @Param('id') id: string,
     @MinioFileName() fileName?: string
   ): Promise<Teacher> {
+    if (fileName) {
+      const { photo } = await this.teacherService.findOne({
+        where: { fullName },
+      });
+
+      await this.minioClientService.deleteOne(photo);
+    }
+
     return await this.teacherService.updateOne(
       { id },
       {

@@ -7,10 +7,7 @@ import * as Minio from 'minio';
 
 @Injectable()
 export class MinioClientService {
-  constructor(
-    private readonly configService: ConfigService
-    // private readonly minioService: MinioService
-  ) {}
+  constructor(private readonly configService: ConfigService) {}
 
   public get client(): Minio.Client {
     return new Minio.Client({
@@ -67,5 +64,9 @@ export class MinioClientService {
       url: `${this.endpoint}:${this.port}/${this.bucket}/${fileName}`,
       fileName,
     };
+  }
+
+  public async deleteOne(fileName: string): Promise<void> {
+    await this.client.removeObject(this.baseBucket, fileName);
   }
 }
