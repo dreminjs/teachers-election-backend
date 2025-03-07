@@ -15,7 +15,7 @@ export class TokenService {
     private readonly userService: UserService
   ) {}
 
-  async generateTokens(email: string): Promise<ITokens> {
+  async generateTokens({email,userId}:{email:string,userId:string}): Promise<ITokens> {
     const refreshToken = this.jwtService.sign(
       { email },
       {
@@ -31,8 +31,6 @@ export class TokenService {
         expiresIn: '1d',
       }
     );
-
-    const { id: userId } = await this.userService.findOne({ where: { email } });
 
     await this.saveRefreshToken({ userId, token: refreshToken });
 

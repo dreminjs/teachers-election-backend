@@ -20,11 +20,11 @@ export class MinioFileUploadInterceptor implements NestInterceptor {
 
     const { file } = request;
 
-    const { fileName } = await this.minioClientService.uploadOne(
+    const result = await this.minioClientService.uploadOne(
       file as BufferedFile
     );
 
-    request['fileName'] = fileName;
+    result?.fileName ? request['fileName'] = result.fileName : request['fileName'] = null
 
     return next.handle();
   }

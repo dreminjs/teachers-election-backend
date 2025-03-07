@@ -23,7 +23,7 @@ import { IGetSubjectsQueryParameters } from './interfaces/iget-subjects-query-pa
 import { IInfiniteScrollResponse } from 'src/shared';
 
 @UseGuards(AccessTokenGuard)
-@Controller('subject')
+@Controller('subjects')
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}
 

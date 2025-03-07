@@ -38,8 +38,12 @@ export class AuthController {
     @Body() body: SigninDto,
     @Res({ passthrough: true }) res: Response
   ): Promise<IAuthResponse> {
+    const { email, id: userId } = await this.userService.findOne({
+      where: { email: body.email },
+    });
+
     const { accessToken, refreshToken } =
-      await this.tokenService.generateTokens(body.email);
+      await this.tokenService.generateTokens({ email, userId });
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
@@ -69,26 +73,19 @@ export class AuthController {
   ): Promise<IAuthResponse> {
     const salt = await bcrypt.genSalt(6);
 
-    const hashedPasswordQuery = this.passwordService.hashPassword(
+    const hashedPassword = await this.passwordService.hashPassword(
       password,
       salt
     );
 
-    const tokensQuery =
-      this.tokenService.generateTokens(email);
+    const { id: userId } = await this.userService.createOne({
+      role: Roles.USER,
+      password: hashedPassword,
+      email,
+      salt,
+    });
 
-
-      const [hashedPassword,tokens] = await Promise.all([
-        hashedPasswordQuery,
-        tokensQuery
-      ])
-
-      const user = await this.userService.createOne({
-        role: Roles.USER,
-        password: hashedPassword,
-        email,
-        salt,
-      });
+    const tokens = await this.tokenService.generateTokens({ userId, email });
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
@@ -105,7 +102,7 @@ export class AuthController {
     });
 
     return {
-      email: user.email,
+      email,
     };
   }
 
@@ -113,7 +110,7 @@ export class AuthController {
   @UseGuards(AccessTokenGuard)
   @Delete('signout')
   public async signout(
-    @CurrentUser("id") userId: string,
+    @CurrentUser('id') userId: string,
     @Res({ passthrough: true }) res: Response
   ): Promise<{ message: string }> {
     await this.tokenService.deleteOne({ userId });

@@ -33,7 +33,7 @@ import { MinioFileName } from 'src/minio-client/minio-file-name.decorator';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
 
 @UseGuards(AccessTokenGuard)
-@Controller('teacher')
+@Controller('teachers')
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
 
