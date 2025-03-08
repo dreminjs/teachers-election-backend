@@ -86,15 +86,21 @@ export class TeacherReviewController {
   @UseGuards(RolesGuard)
   @AllowedRoles(Roles.ADMIN)
   @Put('/aprove/:id')
-  async aprove(@Param("id") id: string): Promise<TeacherReview> {
-    return await this.teacherReviewService.updateOne({id},{isChecked: true})
+  async aprove(@Param('id') id: string): Promise<TeacherReview> {
+    return await this.teacherReviewService.updateOne(
+      { id },
+      { isChecked: true }
+    );
   }
 
   @UseGuards(AccessTokenGuard)
   @UseGuards(RolesGuard)
   @AllowedRoles(Roles.ADMIN)
   @Put('/unaprove/:id')
-  async unaprove(@Param("id") id: string): Promise<TeacherReview> {
-    return await this.teacherReviewService.updateOne({id},{isChecked: false})
+  async unaprove(@Param('id') id: string): Promise<TeacherReview> {
+    return await this.teacherReviewService.updateOne(
+      { id },
+      { isChecked: false }
+    );
   }
 }

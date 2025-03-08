@@ -2,10 +2,8 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
   HttpCode,
   HttpStatus,
-  Logger,
   Post,
   Res,
   UseGuards,
@@ -13,7 +11,7 @@ import {
 import { UserService } from 'src/user/';
 import { SignupDto } from './dto/signup.dto';
 import { SignupGuard } from './guards/signup.guard';
-import { PasswordService } from 'src/password';
+
 import * as bcrypt from 'bcrypt';
 import { SigninGuard } from './guards/signin.guard';
 import { SigninDto } from './dto/signin.dto';
@@ -22,12 +20,12 @@ import { AccessTokenGuard, TokenService } from 'src/token';
 import { IAuthResponse } from './interfaces/auth.interfaces';
 import { Response } from 'express';
 import { CurrentUser } from 'src/user/decorators/current-user.decorator';
+import { hashPassword } from './helpers/password.helpers';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly userService: UserService,
-    private readonly passwordService: PasswordService,
     private readonly tokenService: TokenService
   ) {}
 
@@ -73,7 +71,7 @@ export class AuthController {
   ): Promise<IAuthResponse> {
     const salt = await bcrypt.genSalt(6);
 
-    const hashedPassword = await this.passwordService.hashPassword(
+    const hashedPassword = await hashPassword(
       password,
       salt
     );
@@ -117,7 +115,7 @@ export class AuthController {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
     return {
-      message: 'Success',
+      message: 'You sing out!',
     };
   }
 }

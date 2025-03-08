@@ -6,13 +6,13 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { UserService } from 'src/user';
-import { PasswordService } from 'src/password';
+import { comparePassword } from '../helpers/password.helpers';
+
 
 @Injectable()
 export class SigninGuard implements CanActivate {
   constructor(
     private readonly userService: UserService,
-    private readonly passwordService: PasswordService
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -26,7 +26,7 @@ export class SigninGuard implements CanActivate {
         HttpStatus.BAD_REQUEST
       );
 
-    const isPasswordValid = await this.passwordService.comparePassword(
+    const isPasswordValid = await comparePassword(
       password,
       user.password
     );
