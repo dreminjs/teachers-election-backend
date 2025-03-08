@@ -38,20 +38,26 @@ export class SubjectController {
   public async findMany(
     @Query() { limit, cursor, title, page }: IGetSubjectsQueryParameters
   ): Promise<IWithPagination<Subject> | IInfiniteScrollResponse<Subject>> {
+
+
+    const itemsQuery = this.subjectService.findMany({
+      skip: page ? (page - 1) * limit : cursor,
+      take: limit,
+      orderBy: { createdAt: 'asc' } as Prisma.SubjectOrderByWithRelationInput,
+      where: {
+        ...(title && { title: { contains: title } }),
+      },
+    })
+
+    const itemsCountQuery = this.subjectService.count({
+      where: {
+        ...(title ? { title: { contains: title } } : {}),
+      },
+    })
+
     const [items, count] = await Promise.all([
-      await this.subjectService.findMany({
-        skip: page ? (page - 1) * limit : cursor,
-        take: limit,
-        orderBy: { createdAt: 'asc' } as Prisma.SubjectOrderByWithRelationInput,
-        where: {
-          ...(title && { title: { contains: title } }),
-        },
-      }),
-      await this.subjectService.count({
-        where: {
-          ...(title ? { title: { contains: title } } : {}),
-        },
-      }),
+      await itemsQuery,
+      await itemsCountQuery,
     ]);
 
     if (page) {
