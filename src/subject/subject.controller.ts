@@ -56,8 +56,8 @@ export class SubjectController {
     })
 
     const [items, count] = await Promise.all([
-      await itemsQuery,
-      await itemsCountQuery,
+      itemsQuery,
+      itemsCountQuery,
     ]);
 
     if (page) {
