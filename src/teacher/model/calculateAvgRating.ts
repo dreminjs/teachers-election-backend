@@ -1,4 +1,4 @@
-export const calculateAverageRating = (reviews: { grade: number }[]) => {
-    const total = reviews.reduce((sum, review) => sum + review.grade, 0);
-    return reviews.length ? total / reviews.length : 0;
+export const calculateAverageRating = (grades: number[]) => {
+    const total = grades.reduce((sum, grade) => sum + grade, 0);
+    return grades.length ? total / grades.length : 0;
   };

@@ -15,11 +15,17 @@ export class TokenService {
     private readonly userService: UserService
   ) {}
 
-  async generateTokens({email,userId}:{email:string,userId:string}): Promise<ITokens> {
+  async generateTokens({
+    email,
+    userId,
+  }: {
+    email: string;
+    userId: string;
+  }): Promise<ITokens> {
     const refreshToken = this.jwtService.sign(
       { email },
       {
-        secret: 'REFRESH_TOKEN_SECRET',
+        secret: this.configService.get('REFRESH_TOKEN_SECRET'),
         expiresIn: '7d',
       }
     );
@@ -27,7 +33,7 @@ export class TokenService {
     const accessToken = this.jwtService.sign(
       { email },
       {
-        secret: 'ACCESS_TOKEN_SECRET',
+        secret: this.configService.get('ACCESS_TOKEN_SECRET'),
         expiresIn: '1d',
       }
     );
@@ -54,10 +60,16 @@ export class TokenService {
     return true;
   }
 
-  public async verifyToken(token: string): Promise<string | null> {
+  public async verifyOne({
+    token,
+    secret,
+  }: {
+    token: string;
+    secret: string;
+  }): Promise<string | null> {
     try {
       const payload = await this.jwtService.verify(token, {
-        secret: 'ACCESS_TOKEN_SECRET',
+        secret,
       });
 
       return payload;
@@ -70,8 +82,9 @@ export class TokenService {
     return await this.jwtService.decode(token);
   }
 
-  public async deleteOne(where: Prisma.RefreshTokenWhereUniqueInput) : Promise<void> {
-    await this.prisma.refreshToken.delete({where})
+  public async deleteOne(
+    where: Prisma.RefreshTokenWhereUniqueInput
+  ): Promise<void> {
+    await this.prisma.refreshToken.delete({ where });
   }
-
 }

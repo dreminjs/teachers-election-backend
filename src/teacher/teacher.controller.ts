@@ -80,7 +80,7 @@ export class TeacherController {
     return await this.teacherService.updateOne(
       { id },
       {
-        ...(fullName ? { fullName: fullName } : {}),
+        ...(fullName ? { fullName } : {}),
         ...(fileName ? { photo: fileName } : {}),
         ...(subjectId ? { subjectId } : {}),
       }
@@ -128,7 +128,9 @@ export class TeacherController {
       data: teachers.map((teacher) => ({
         ...teacher,
         subject: teacher.subject.title,
-        avgRating: calculateAverageRating(teacher.teacherReview),
+        avgRating: calculateAverageRating(
+          teacher.teacherReview.map((el) => el.grade)
+        ),
         subjectId: undefined,
         teacherReview: undefined,
       })),
@@ -157,7 +159,9 @@ export class TeacherController {
       fullName: teacher.fullName,
       subject: teacher.subject.title,
       photo: teacher.photo,
-      avgRating: calculateAverageRating(teacher.teacherReview),
+      avgRating: calculateAverageRating(
+        teacher.teacherReview.map((el) => el.grade)
+      ),
     };
   }
 

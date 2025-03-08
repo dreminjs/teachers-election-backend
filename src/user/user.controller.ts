@@ -15,7 +15,7 @@ export class UserController {
     return await this.userService.findOne({ where: { id: id } });
   }
 
-  @Get('info')
+  @Get('me')
   public async info(@CurrentUser() { email, role }: User): Promise<IUser> {
     return {
       email,

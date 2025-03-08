@@ -24,14 +24,13 @@ export class AccessTokenStrategy extends PassportStrategy(
           let token = null;
           if (req && req.cookies) {
             token = req.cookies['accessToken'];
-            this.logger.log(`User has been validated`);
             this.logger.log(token);
           }
           return token;
         },
       ]),
       ignoreExpiration: false,
-      secretOrKey: 'ACCESS_TOKEN_SECRET',
+      secretOrKey: configService.get('ACCESS_TOKEN_SECRET'),
     });
   }
 
