@@ -38,8 +38,6 @@ export class SubjectController {
   public async findMany(
     @Query() { limit, cursor, title, page }: IGetSubjectsQueryParameters
   ): Promise<IWithPagination<Subject> | IInfiniteScrollResponse<Subject>> {
-
-
     const itemsQuery = this.subjectService.findMany({
       skip: page ? (page - 1) * limit : cursor,
       take: limit,
