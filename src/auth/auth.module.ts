@@ -12,7 +12,7 @@ import { AccessTokenGuard } from '../token/guards/access-token.guard';
     PrismaModule,
     TokenModule,
     ConfigModule,
-    UserModule,
+    forwardRef(() => UserModule),
   ],
   controllers: [AuthController],
   providers: [AccessTokenStrategy,AccessTokenGuard],

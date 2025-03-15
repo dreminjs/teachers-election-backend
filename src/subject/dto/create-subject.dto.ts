@@ -1,6 +1,8 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
 
 export class CreateSubjectDto {
+  @ApiProperty()
   @IsString()
   @IsNotEmpty({ message: 'Название предмета не может быть пустым' })
   @MinLength(3, { message: 'Название предмета должно быть не менее 3 символов' })

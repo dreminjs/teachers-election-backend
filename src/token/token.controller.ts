@@ -1,8 +1,6 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { ITokens } from './interfaces/tokens.interface';
 import { TokenService } from './token.service';
-
-import { User } from '@prisma/client';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { CurrentUser } from 'src/user/decorators/current-user.decorator';
 import { Response } from 'express';

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from '@prisma/client';
@@ -11,7 +11,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get(':id')
-  public async findOne(@Query('id') id: string): Promise<User> {
+  public async findOne(@Param('id') id: string): Promise<User> {
     return await this.userService.findOne({ where: { id: id } });
   }
 

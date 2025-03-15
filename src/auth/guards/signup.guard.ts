@@ -9,8 +9,7 @@ export class SignupGuard implements CanActivate {
   private logger = new Logger(SignupGuard.name.toLocaleUpperCase())
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const { email, codeWord } = context.switchToHttp().getRequest()
-      .body as SignupDto;
+    const { email, codeWord } = context.switchToHttp().getRequest().body as SignupDto;
 
     this.logger.log({email})
 

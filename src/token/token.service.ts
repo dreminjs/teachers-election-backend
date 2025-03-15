@@ -78,8 +78,8 @@ export class TokenService {
     }
   }
 
-  public async decodeToken(token: string): Promise<string> {
-    return await this.jwtService.decode(token);
+  public decodeToken(token: string): {email: string} {
+    return this.jwtService.decode(token);
   }
 
   public async deleteOne(

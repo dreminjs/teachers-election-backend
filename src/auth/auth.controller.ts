@@ -62,7 +62,7 @@ export class AuthController {
     };
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @UseGuards(SignupGuard)
   @Post('signup')
   async signup(
@@ -71,10 +71,7 @@ export class AuthController {
   ): Promise<IAuthResponse> {
     const salt = await bcrypt.genSalt(6);
 
-    const hashedPassword = await hashPassword(
-      password,
-      salt
-    );
+    const hashedPassword = await hashPassword({ password, salt });
 
     const { id: userId } = await this.userService.createOne({
       role: Roles.USER,

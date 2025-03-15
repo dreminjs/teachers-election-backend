@@ -2,7 +2,7 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'prisma/prisma-client';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/user';
 import { Request } from 'express';
 
@@ -12,7 +12,6 @@ export class AccessTokenStrategy extends PassportStrategy(
   Strategy,
   'AccessTokenStrategy'
 ) {
-  private logger = new Logger(AccessTokenStrategy.name);
 
   constructor(
     private readonly configService: ConfigService,
@@ -21,12 +20,11 @@ export class AccessTokenStrategy extends PassportStrategy(
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (req: Request) => {
-          let token = null;
-          if (req && req.cookies) {
-            token = req.cookies['accessToken'];
-            this.logger.log(token);
+          if (req.cookies) {
+            return req.cookies['accessToken'];
+          }else {
+            throw new UnauthorizedException()
           }
-          return token;
         },
       ]),
       ignoreExpiration: false,
@@ -34,7 +32,7 @@ export class AccessTokenStrategy extends PassportStrategy(
     });
   }
 
-  async validate({ email }: { email: string }): Promise<User | null> {
+  async validate({ email }: { email: string }): Promise<User> {
     return await this.userService.findOne({ where: { email } });
   }
 }

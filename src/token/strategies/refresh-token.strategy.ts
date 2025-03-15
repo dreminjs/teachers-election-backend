@@ -2,7 +2,7 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'prisma/prisma-client';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/user';
 import { Request } from 'express';
 
@@ -19,11 +19,11 @@ export class RefreshTokenStrategy extends PassportStrategy(
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (req: Request) => {
-          let token = null;
-          if (req && req.cookies) {
-            token = req.cookies['refreshToken'];
+          if (req.cookies) {
+            return req.cookies['refreshToken'];
+          }else {
+            throw new UnauthorizedException()
           }
-          return token;
         },
       ]),
       ignoreExpiration: false,
@@ -31,7 +31,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     });
   }
 
-  async validate({ email }: { email: string }): Promise<User | null> {
+  async validate({ email }: { email: string }): Promise<User> {
     return await this.userService.findOne({ where: { email } });
   }
 }
