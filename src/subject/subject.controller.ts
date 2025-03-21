@@ -3,9 +3,7 @@ import {
   Controller,
   Delete,
   Get,
-  Logger,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -21,10 +19,8 @@ import { UpdateSubjectDto } from './dto/update-subject.dto';
 import { IWithPagination } from 'src/shared/interfaces/with-pagination';
 import { IGetSubjectsQueryParameters } from './interfaces/iget-subjects-query-parameters';
 import { IInfiniteScrollResponse } from 'src/shared';
-import { ApiExtraModels, ApiQuery } from '@nestjs/swagger';
 
 @UseGuards(AccessTokenGuard)
-@ApiExtraModels(IGetSubjectsQueryParameters)
 @Controller('subjects')
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}
@@ -37,7 +33,6 @@ export class SubjectController {
   }
 
 
-  @ApiQuery({type: IGetSubjectsQueryParameters})
   @Get()
   public async findMany(
     @Query() { limit, cursor, title, page }: IGetSubjectsQueryParameters
