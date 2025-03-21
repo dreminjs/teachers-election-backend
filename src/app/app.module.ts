@@ -5,8 +5,6 @@ import { AuthModule } from '../auth';
 import { TeacherModule } from 'src/teacher/';
 import { ConfigModule } from '@nestjs/config';
 import { TeacherReviewModule } from 'src/teacher-review';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { SubjectModule } from 'src/subject';
 import { MinioClientModule } from 'src/minio-client/minio-client.module';
 
@@ -21,9 +19,6 @@ import { MinioClientModule } from 'src/minio-client/minio-client.module';
     TeacherModule,
     TeacherReviewModule,
     MinioClientModule,
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'images'),
-    }),
   ],
 })
 export class AppModule {}

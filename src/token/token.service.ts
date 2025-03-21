@@ -12,7 +12,6 @@ export class TokenService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly prisma: PrismaService,
-    private readonly userService: UserService
   ) {}
 
   async generateTokens({
@@ -38,23 +37,19 @@ export class TokenService {
       }
     );
 
-    await this.saveRefreshToken({ userId, token: refreshToken });
+    await this.saveRefreshToken({
+      user: { connect: { id: userId } },
+      token: refreshToken,
+    });
 
     return { accessToken, refreshToken };
   }
 
-  private async saveRefreshToken({
-    userId,
-    token,
-  }: {
-    userId: string;
-    token: string;
-  }): Promise<boolean> {
+  private async saveRefreshToken(
+    data: Prisma.RefreshTokenCreateInput
+  ): Promise<boolean> {
     await this.prisma.refreshToken.create({
-      data: {
-        userId,
-        token,
-      },
+      data,
     });
 
     return true;
@@ -78,7 +73,7 @@ export class TokenService {
     }
   }
 
-  public decodeToken(token: string): {email: string} {
+  public decodeToken(token: string): { token: string } {
     return this.jwtService.decode(token);
   }
 

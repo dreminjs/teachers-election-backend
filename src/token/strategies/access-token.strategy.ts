@@ -22,7 +22,7 @@ export class AccessTokenStrategy extends PassportStrategy(
         (req: Request) => {
           if (req.cookies) {
             return req.cookies['accessToken'];
-          }else {
+          } else {
             throw new UnauthorizedException()
           }
         },

@@ -21,7 +21,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
         (req: Request) => {
           if (req.cookies) {
             return req.cookies['refreshToken'];
-          }else {
+          } else {
             throw new UnauthorizedException()
           }
         },

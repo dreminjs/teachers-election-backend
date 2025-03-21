@@ -11,8 +11,8 @@ model Teacher {
   id            String          @id @default(uuid())
   fullName      String
   photo         String
-  subject       Subject         @relation(fields: [subjectId], references: [id]) // Связь с Subject
-  subjectId     String          // Внешний ключ для Subject
+  subject       Subject         @relation(fields: [subjectId], references: [id])
+  subjectId     String         
   teacherReview TeacherReview[]
 }
 

@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from '@prisma/client';
