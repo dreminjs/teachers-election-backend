@@ -20,7 +20,7 @@ import { GetTeacherReviewsQueryParameters } from './query-parameters/get-teacher
 import { IInfiniteScrollResponse } from 'src/shared';
 
 @UseGuards(AccessTokenGuard)
-@Controller('teacher-review')
+@Controller('teacher-reviews')
 export class TeacherReviewController {
   constructor(private readonly teacherReviewService: TeacherReviewService) {}
 

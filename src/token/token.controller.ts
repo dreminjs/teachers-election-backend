@@ -7,7 +7,7 @@ import { Response } from 'express';
 import { UserService } from 'src/user';
 
 @UseGuards(RefreshTokenGuard)
-@Controller('token')
+@Controller('tokens')
 export class TokenController {
   constructor(
     private readonly tokenService: TokenService,

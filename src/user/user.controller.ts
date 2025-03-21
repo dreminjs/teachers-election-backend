@@ -14,7 +14,7 @@ import { IUser } from './interfaces/user.interfaces';
 import { UserService } from './user.service';
 
 @UseGuards(AccessTokenGuard)
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
