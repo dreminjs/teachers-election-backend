@@ -35,7 +35,7 @@ export class TeacherReviewController {
       body.strictness,
     ];
 
-    const averageGrade = grades.reduce((sum, value) => sum + value, 0);
+    const sumGrade = grades.reduce((sum, value) => sum + value, 0);
 
     return this.teacherReviewService.createOne({
       freebie: body.freebie,
@@ -46,7 +46,7 @@ export class TeacherReviewController {
       message: body.message,
       user: { connect: { id: userId } },
       isChecked: false,
-      grade: averageGrade,
+      grade: Math.round(sumGrade / 5),
       teacher: {
         connect: { id: body.teacherId },
       },
