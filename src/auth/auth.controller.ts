@@ -59,6 +59,7 @@ export class AuthController {
 
     return {
       email: body.email,
+      id: userId
     };
   }
 
@@ -98,6 +99,7 @@ export class AuthController {
 
     return {
       email,
+      id: userId
     };
   }
 

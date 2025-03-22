@@ -3,9 +3,7 @@ import {
   Controller,
   Delete,
   Get,
-  Logger,
   Param,
-  ParseBoolPipe,
   Post,
   Put,
   Query,
@@ -14,7 +12,7 @@ import {
 import { TeacherReviewService } from './teacher-review.service';
 import { CreateTeacherReviewDto } from './dto/create-teacher-review.dto';
 import { AccessTokenGuard } from 'src/token';
-import { Roles, Teacher, TeacherReview, User } from '@prisma/client';
+import { Roles, TeacherReview } from '@prisma/client';
 import { AllowedRoles, CurrentUser, RolesGuard } from 'src/user';
 import { GetTeacherReviewsQueryParameters } from './query-parameters/get-teacher-reviews.query-parameters';
 import { IInfiniteScrollResponse } from 'src/shared';
@@ -26,7 +24,7 @@ export class TeacherReviewController {
 
   @Post()
   async createOne(
-    @CurrentUser() { id: userId }: User,
+    @CurrentUser("id") userId: string,
     @Body() body: CreateTeacherReviewDto
   ): Promise<TeacherReview> {
     const grades = [

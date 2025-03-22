@@ -3,8 +3,8 @@ import {
   IsInt,
   IsOptional,
   IsString,
-  MaxLength,
-  MinLength,
+  Max,
+  Min,
 } from 'class-validator';
 
 export class CreateTeacherReviewDto {
@@ -12,28 +12,28 @@ export class CreateTeacherReviewDto {
   @IsOptional()
   message: string | null;
   @IsInt()
-  @MinLength(1)
-  @MaxLength(5)
+  @Min(1)
+  @Max(5)
   @Type(() => Number)
   freebie: number;
   @IsInt()
-  @MinLength(1)
-  @MaxLength(5)
+  @Min(1)
+  @Max(5)
   @Type(() => Number)
   friendliness: number;
   @IsInt()
-  @MinLength(1)
-  @MaxLength(5)
+  @Min(1)
+  @Max(5)
   @Type(() => Number)
   experienced: number;
   @IsInt()  
-  @MinLength(1)
-  @MaxLength(5)
+  @Min(1)
+  @Max(5)
   @Type(() => Number)
   strictness: number;
   @IsInt()
-  @MinLength(1)
-  @MaxLength(5)
+  @Min(1)
+  @Max(5)
   @Type(() => Number)
   smartless: number;
   @IsString()
