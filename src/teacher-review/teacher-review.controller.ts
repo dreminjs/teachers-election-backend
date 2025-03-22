@@ -38,15 +38,10 @@ export class TeacherReviewController {
     const sumGrade = grades.reduce((sum, value) => sum + value, 0);
 
     return this.teacherReviewService.createOne({
-      freebie: body.freebie,
-      friendliness: body.friendliness,
-      experienced: body.experienced,
-      strictness: body.strictness,
-      smartless: body.smartless,
-      message: body.message,
-      user: { connect: { id: userId } },
+      ...body,
       isChecked: false,
       grade: Math.round(sumGrade / 5),
+      user: { connect: { id: userId } },
       teacher: {
         connect: { id: body.teacherId },
       },
@@ -83,8 +78,8 @@ export class TeacherReviewController {
   @UseGuards(AccessTokenGuard)
   @UseGuards(RolesGuard)
   @AllowedRoles(Roles.ADMIN)
-  @Put('/aprove/:id')
-  async aprove(@Param('id') id: string): Promise<TeacherReview> {
+  @Put('/approve/:id')
+  async approve(@Param('id') id: string): Promise<TeacherReview> {
     return await this.teacherReviewService.updateOne(
       { id },
       { isChecked: true }
@@ -94,8 +89,8 @@ export class TeacherReviewController {
   @UseGuards(AccessTokenGuard)
   @UseGuards(RolesGuard)
   @AllowedRoles(Roles.ADMIN)
-  @Put('/unaprove/:id')
-  async unaprove(@Param('id') id: string): Promise<TeacherReview> {
+  @Put('/unapprove/:id')
+  async unapprove(@Param('id') id: string): Promise<TeacherReview> {
     return await this.teacherReviewService.updateOne(
       { id },
       { isChecked: false }
