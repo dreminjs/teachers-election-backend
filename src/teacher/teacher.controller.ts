@@ -32,13 +32,15 @@ import { MinioFileUploadInterceptor } from 'src/minio-client/minio-file-upload.i
 import { MinioFileName } from 'src/minio-client/minio-file-name.decorator';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { MinioClientService } from 'src/minio-client/minio-client.service';
+import { TeacherReviewService } from 'src/teacher-review/teacher-review.service';
 
 @UseGuards(AccessTokenGuard)
 @Controller('teachers')
 export class TeacherController {
   constructor(
     private readonly teacherService: TeacherService,
-    private readonly minioClientService: MinioClientService
+    private readonly minioClientService: MinioClientService,
+    private readonly teacherReviewServce: TeacherReviewService
   ) {}
 
   @UseInterceptors(FileInterceptor('file'), MinioFileUploadInterceptor)
@@ -47,15 +49,15 @@ export class TeacherController {
   @HttpCode(HttpStatus.CREATED)
   @Post()
   async createOne(
-    @Body() body: CreateTeacherDto,
-    @MinioFileName() fileName: string
+    @Body() { fullName, subjectId }: CreateTeacherDto,
+    @MinioFileName() photo: string
   ): Promise<Teacher> {
     return await this.teacherService.createOne({
-      fullName: body.fullName,
+      fullName,
       subject: {
-        connect: { id: body.subjectId },
+        connect: { id: subjectId },
       },
-      photo: fileName,
+      photo,
     });
   }
 
@@ -67,21 +69,19 @@ export class TeacherController {
   async updateOne(
     @Body() { fullName, subjectId }: UpdateTeacherDto,
     @Param('id') id: string,
-    @MinioFileName() fileName?: string
+    @MinioFileName() photo?: string
   ): Promise<Teacher> {
-    if (fileName) {
+    if (photo) {
       const { photo } = await this.teacherService.findOne({
         where: { fullName },
       });
-
       await this.minioClientService.deleteOne(photo);
     }
-
     return await this.teacherService.updateOne(
       { id },
       {
         ...(fullName ? { fullName } : {}),
-        ...(fileName ? { photo: fileName } : {}),
+        ...(photo ? { photo } : {}),
         ...(subjectId ? { subjectId } : {}),
       }
     );
@@ -97,7 +97,6 @@ export class TeacherController {
       subjectIds,
       thresholdRating,
       rating,
-      
     }: GetTeachersQueryParameters
   ): Promise<IInfiniteScrollResponse<ITeacherExtendedResponse>> {
     const teachers = (await this.teacherService.findMany({
@@ -109,7 +108,6 @@ export class TeacherController {
           ? { teacherReview: { some: { grade: { gte: thresholdRating } } } }
           : {}),
         ...(rating ? { teacherReview: { some: { grade: rating } } } : {}),
-        
       },
       include: {
         subject: {
@@ -133,6 +131,7 @@ export class TeacherController {
         avgRating: calculateAverageRating(
           teacher.teacherReview.map((el) => el.grade)
         ),
+        
         subjectId: undefined,
         teacherReview: undefined,
       })),
@@ -142,7 +141,7 @@ export class TeacherController {
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<ITeacherExtendedResponse> {
-    const teacher = (await this.teacherService.findOne({
+    const teacherQuery = this.teacherService.findOne({
       where: { id },
       include: {
         subject: {
@@ -154,16 +153,33 @@ export class TeacherController {
           select: { grade: true },
         },
       },
-    })) as ITeacherExtended;
+    }) as Promise<ITeacherExtended>;
+
+    const countTeacherReviewsQuery = this.teacherReviewServce.count({
+      where: {
+        teacher: {
+          id,
+        },
+      },
+    });
+
+    const [
+      {
+        fullName,
+        photo,
+        teacherReview,
+        subject: { title },
+      },
+      countTeacherReviews
+    ] = await Promise.all([teacherQuery, countTeacherReviewsQuery]);
 
     return {
-      id: teacher.id,
-      fullName: teacher.fullName,
-      subject: teacher.subject.title,
-      photo: teacher.photo,
-      avgRating: calculateAverageRating(
-        teacher.teacherReview.map((el) => el.grade)
-      ),
+      id,
+      fullName,
+      subject: title,
+      photo,
+      avgRating: calculateAverageRating(teacherReview.map((el) => el.grade)),
+      countTeacherReviews,
     };
   }
 

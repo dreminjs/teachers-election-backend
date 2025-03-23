@@ -1,6 +1,7 @@
-import { Type } from 'class-transformer';
+
 import {
   IsEmail,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -9,6 +10,10 @@ import {
 export class SignupDto {
   @IsEmail({})
   email: string;
+
+  @IsOptional()
+  @IsString()
+  nickName?: string
 
   @IsString()
   @MaxLength(6)

@@ -13,4 +13,5 @@ export interface ITeacherExtendedResponse {
   id: string
   fullName: string
   photo: string
+  countTeacherReviews?: number
 }

@@ -8,14 +8,13 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/user/';
 import { SignupDto } from './dto/signup.dto';
 import { SignupGuard } from './guards/signup.guard';
-
-import * as bcrypt from 'bcrypt';
 import { SigninGuard } from './guards/signin.guard';
 import { SigninDto } from './dto/signin.dto';
-import { Roles, User } from '@prisma/client';
+import { Roles } from '@prisma/client';
 import { AccessTokenGuard, TokenService } from 'src/token';
 import { IAuthResponse } from './interfaces/auth.interfaces';
 import { Response } from 'express';
@@ -40,17 +39,16 @@ export class AuthController {
       where: { email: body.email },
     });
 
-    const { accessToken, refreshToken } =
-      await this.tokenService.generateTokens({ email, userId });
+    const tokens = await this.tokenService.generateTokens({ email, userId });
 
-    res.cookie('accessToken', accessToken, {
+    res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
       sameSite: 'none',
       secure: true,
     });
 
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
       sameSite: 'none',
@@ -58,8 +56,8 @@ export class AuthController {
     });
 
     return {
-      email: body.email,
-      id: userId
+      email,
+      id: userId,
     };
   }
 
@@ -67,7 +65,7 @@ export class AuthController {
   @UseGuards(SignupGuard)
   @Post('signup')
   async signup(
-    @Body() { email, password }: SignupDto,
+    @Body() { email, password, nickName }: SignupDto,
     @Res({ passthrough: true }) res: Response
   ): Promise<IAuthResponse> {
     const salt = await bcrypt.genSalt(6);
@@ -75,6 +73,7 @@ export class AuthController {
     const hashedPassword = await hashPassword({ password, salt });
 
     const { id: userId } = await this.userService.createOne({
+      ...(nickName ? { nickName } : {}),
       role: Roles.USER,
       password: hashedPassword,
       email,
@@ -99,7 +98,7 @@ export class AuthController {
 
     return {
       email,
-      id: userId
+      id: userId,
     };
   }
 

@@ -56,6 +56,9 @@ export class TeacherReviewController {
     const teachersReviews = await this.teacherReviewService.findMany({
       take: limit,
       skip: cursor,
+      include: {
+        user: true
+      },
       where: {
         teacher: { id: teacherId },
         isChecked: isChecked || false,

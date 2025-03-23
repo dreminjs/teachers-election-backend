@@ -26,4 +26,9 @@ export class TeacherReviewService {
   async deleteOne(where: Prisma.TeacherReviewWhereUniqueInput) {
     return await this.prisma.teacherReview.delete({ where });
   }
+
+  async count(args: Prisma.TeacherReviewCountArgs) {
+    return await this.prisma.teacherReview.count(args)
+  }
+
 }
