@@ -97,6 +97,7 @@ export class TeacherController {
       subjectIds,
       thresholdRating,
       rating,
+      
     }: GetTeachersQueryParameters
   ): Promise<IInfiniteScrollResponse<ITeacherExtendedResponse>> {
     const teachers = (await this.teacherService.findMany({
@@ -108,6 +109,7 @@ export class TeacherController {
           ? { teacherReview: { some: { grade: { gte: thresholdRating } } } }
           : {}),
         ...(rating ? { teacherReview: { some: { grade: rating } } } : {}),
+        
       },
       include: {
         subject: {

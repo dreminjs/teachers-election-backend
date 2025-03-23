@@ -35,12 +35,12 @@ export class TeacherReviewController {
       body.strictness,
     ];
 
-    const sumGrade = grades.reduce((sum, value) => sum + value, 0);
+    const sumGrades = grades.reduce((sum, value) => sum + value, 0);
 
     return this.teacherReviewService.createOne({
       ...body,
       isChecked: false,
-      grade: Math.round(sumGrade / 5),
+      grade: Math.round(sumGrades / 5),
       user: { connect: { id: userId } },
       teacher: {
         connect: { id: body.teacherId },
@@ -51,7 +51,7 @@ export class TeacherReviewController {
   @Get()
   async findMany(
     @Query()
-    { teacherId, isChecked, cursor, limit }: GetTeacherReviewsQueryParameters
+    { teacherId, isChecked, cursor, limit, includeComments }: GetTeacherReviewsQueryParameters
   ): Promise<IInfiniteScrollResponse<TeacherReview>> {
     const teachersReviews = await this.teacherReviewService.findMany({
       take: limit,
@@ -59,6 +59,7 @@ export class TeacherReviewController {
       where: {
         teacher: { id: teacherId },
         isChecked: isChecked || false,
+        ...(includeComments ? { message: { not: null } } : {})
       },
     });
 
@@ -75,8 +76,7 @@ export class TeacherReviewController {
     await this.teacherReviewService.deleteOne({ id });
   }
 
-  @UseGuards(AccessTokenGuard)
-  @UseGuards(RolesGuard)
+  @UseGuards(RolesGuard,AccessTokenGuard)
   @AllowedRoles(Roles.ADMIN)
   @Put('/approve/:id')
   async approve(@Param('id') id: string): Promise<TeacherReview> {
@@ -86,8 +86,7 @@ export class TeacherReviewController {
     );
   }
 
-  @UseGuards(AccessTokenGuard)
-  @UseGuards(RolesGuard)
+  @UseGuards(RolesGuard,AccessTokenGuard)
   @AllowedRoles(Roles.ADMIN)
   @Put('/unapprove/:id')
   async unapprove(@Param('id') id: string): Promise<TeacherReview> {

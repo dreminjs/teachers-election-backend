@@ -9,4 +9,6 @@ export class GetTeacherReviewsQueryParameters {
   limit: number;
   @Type(() => Number)
   cursor: number;
+  @Type(() => Boolean)
+  includeComments: boolean
 }
