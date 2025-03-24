@@ -74,7 +74,7 @@ export class TeacherReviewController {
 
     const nextCursor = teachersReviews.length < limit ? null : cursor + limit;
 
-    const reviewIds = teachersReviews.map((review) => review.id)
+    const reviewIds = teachersReviews ? teachersReviews?.map((review) => review.id) : []
 
     const likesCounts = await this.likeService.groupBy(reviewIds);
 
