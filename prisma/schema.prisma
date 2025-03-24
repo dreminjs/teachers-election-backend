@@ -32,7 +32,6 @@ model TeacherReview {
   id           String  @id @default(uuid())
   message      String?
   isChecked    Boolean
-  grade        Int     @default(0)
   freebie      Int
   friendliness Int
   experienced  Int

@@ -11,6 +11,7 @@ export interface ExtendedTeacherReviewResponse extends TeacherReview {
         id:string
         nickName: string 
     }
+    likesCount: number
     userId: undefined
 }
 
