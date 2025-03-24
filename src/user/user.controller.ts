@@ -24,7 +24,7 @@ export class UserController {
   }
 
   @Get('me')
-  public async info(@CurrentUser() { email, role,nickName }: User): Promise<IUser> {
+  public async info(@CurrentUser() { email, role, nickName }: User): Promise<IUser> {
     return {
       email,
       role,
