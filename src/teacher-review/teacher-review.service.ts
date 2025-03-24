@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Like, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma';
 
 
@@ -30,5 +30,7 @@ export class TeacherReviewService {
   async count(args: Prisma.TeacherReviewCountArgs) {
     return await this.prisma.teacherReview.count(args)
   }
+
+
 
 }

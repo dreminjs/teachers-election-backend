@@ -12,19 +12,29 @@ import {
 import { TeacherReviewService } from './teacher-review.service';
 import { CreateTeacherReviewDto } from './dto/create-teacher-review.dto';
 import { AccessTokenGuard } from 'src/token';
-import { Roles, TeacherReview } from '@prisma/client';
+import { Like, Roles, TeacherReview } from '@prisma/client';
 import { AllowedRoles, CurrentUser, RolesGuard } from 'src/user';
 import { GetTeacherReviewsQueryParameters } from './query-parameters/get-teacher-reviews.query-parameters';
 import { IInfiniteScrollResponse } from 'src/shared';
+import { CreateTeacherReviewLikeDto } from './dto/create-teacher-review-like.dto';
+import { LikeService } from 'src/like/like.service';
+import { LikeOwnerGuard } from 'src/like/like-owner-like.guard';
+import {
+  ExtendedTeacherReview,
+  ExtendedTeacherReviewResponse,
+} from './interfaces/teacher.interface';
 
 @UseGuards(AccessTokenGuard)
 @Controller('teacher-reviews')
 export class TeacherReviewController {
-  constructor(private readonly teacherReviewService: TeacherReviewService) {}
+  constructor(
+    private readonly teacherReviewService: TeacherReviewService,
+    private readonly likeService: LikeService
+  ) {}
 
   @Post()
   async createOne(
-    @CurrentUser("id") userId: string,
+    @CurrentUser('id') userId: string,
     @Body() body: CreateTeacherReviewDto
   ): Promise<TeacherReview> {
     const grades = [
@@ -51,25 +61,38 @@ export class TeacherReviewController {
   @Get()
   async findMany(
     @Query()
-    { teacherId, isChecked, cursor, limit, includeComments }: GetTeacherReviewsQueryParameters
-  ): Promise<IInfiniteScrollResponse<TeacherReview>> {
-    const teachersReviews = await this.teacherReviewService.findMany({
+    {
+      teacherId,
+      isChecked,
+      cursor,
+      limit,
+      includeComments,
+    }: GetTeacherReviewsQueryParameters
+  ): Promise<IInfiniteScrollResponse<ExtendedTeacherReviewResponse>> {
+    const teachersReviews = (await this.teacherReviewService.findMany({
       take: limit,
       skip: cursor,
       include: {
-        user: true
+        user: true,
       },
       where: {
         teacher: { id: teacherId },
         isChecked: isChecked || false,
-        ...(includeComments ? { message: { not: null } } : {})
+        ...(includeComments ? { message: { not: null } } : {}),
       },
-    });
+    })) as ExtendedTeacherReview[];
 
     const nextCursor = teachersReviews.length < limit ? null : cursor + limit;
 
     return {
-      data: teachersReviews,
+      data: teachersReviews.map((el) => ({
+        ...el,
+        user: {
+          nickName: el.user.nickName,
+          id: el.userId,
+        },
+        userId: undefined,
+      })),
       nextCursor,
     };
   }
@@ -79,7 +102,7 @@ export class TeacherReviewController {
     await this.teacherReviewService.deleteOne({ id });
   }
 
-  @UseGuards(RolesGuard,AccessTokenGuard)
+  @UseGuards(RolesGuard, AccessTokenGuard)
   @AllowedRoles(Roles.ADMIN)
   @Put('/approve/:id')
   async approve(@Param('id') id: string): Promise<TeacherReview> {
@@ -89,7 +112,7 @@ export class TeacherReviewController {
     );
   }
 
-  @UseGuards(RolesGuard,AccessTokenGuard)
+  @UseGuards(RolesGuard, AccessTokenGuard)
   @AllowedRoles(Roles.ADMIN)
   @Put('/unapprove/:id')
   async unapprove(@Param('id') id: string): Promise<TeacherReview> {
@@ -97,5 +120,29 @@ export class TeacherReviewController {
       { id },
       { isChecked: false }
     );
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Post('/like')
+  public async like(
+    @CurrentUser('id') userId: string,
+    @Body() { teacherReviewId }: CreateTeacherReviewLikeDto
+  ): Promise<Like> {
+    return await this.likeService.createOne({
+      data: {
+        teacherReview: { connect: { id: teacherReviewId } },
+        user: { connect: { id: userId } },
+      },
+    });
+  }
+
+  @UseGuards(AccessTokenGuard, LikeOwnerGuard)
+  @Delete(':likeId')
+  public async unlike(
+    @Param('likeId') likeId: string
+  ): Promise<{ message: 'Success' | 'Fail' }> {
+    await this.likeService.deleteOne({ id: likeId });
+
+    return { message: 'Success' };
   }
 }
