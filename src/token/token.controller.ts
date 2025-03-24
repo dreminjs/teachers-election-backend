@@ -21,6 +21,8 @@ export class TokenController {
   ): Promise<ITokens> {
     const { id: userId } = await this.userService.findOne({ where: { email } });
 
+    await this.tokenService.deleteOne({ userId });
+
     const { accessToken, refreshToken } =
       await this.tokenService.generateTokens({ userId, email });
 
