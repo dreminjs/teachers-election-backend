@@ -104,10 +104,6 @@ export class TeacherController {
       where: {
         ...(search ? { fullName: { contains: search } } : {}),
         ...(subjectIds ? { subjectId: { in: subjectIds } } : {}),
-        ...(thresholdRating
-          ? { teacherReview: { some: { grade: { gte: thresholdRating } } } }
-          : {}),
-        ...(rating ? { teacherReview: { some: { grade: rating } } } : {}),
       },
       include: {
         subject: {
@@ -115,9 +111,7 @@ export class TeacherController {
             title: true,
           },
         },
-        teacherReview: {
-          select: { grade: true },
-        },
+       
       },
       skip: cursor,
     })) as ITeacherExtended[];
@@ -149,9 +143,7 @@ export class TeacherController {
             title: true,
           },
         },
-        teacherReview: {
-          select: { grade: true },
-        },
+     
       },
     }) as Promise<ITeacherExtended>;
 
