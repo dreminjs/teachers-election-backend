@@ -33,6 +33,7 @@ import { MinioFileName } from 'src/minio-client/minio-file-name.decorator';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { TeacherReviewService } from 'src/teacher-review/teacher-review.service';
+import { PrismaService } from 'src/prisma';
 
 @UseGuards(AccessTokenGuard)
 @Controller('teachers')
@@ -40,7 +41,8 @@ export class TeacherController {
   constructor(
     private readonly teacherService: TeacherService,
     private readonly minioClientService: MinioClientService,
-    private readonly teacherReviewServce: TeacherReviewService
+    private readonly teacherReviewServce: TeacherReviewService,
+    private readonly prisma: PrismaService
   ) {}
 
   @UseInterceptors(FileInterceptor('file'), MinioFileUploadInterceptor)
@@ -103,6 +105,7 @@ export class TeacherController {
   > {
     const teachers = (await this.teacherService.findMany({
       take: limit,
+      skip: cursor,
       where: {
         ...(search ? { fullName: { contains: search } } : {}),
         ...(subjectIds ? { subjectId: { in: subjectIds } } : {}),
@@ -114,19 +117,57 @@ export class TeacherController {
           },
         },
       },
-      skip: cursor,
     })) as ITeacherExtended[];
+
+    const teacherRatings = await this.prisma.teacherReview.groupBy({
+      by: ['teacherId'],
+      _avg: {
+        freebie: true,
+        friendliness: true,
+        experienced: true,
+        strictness: true,
+        smartless: true,
+      },
+      _count: true,
+    });
+
+
+    const ratingsMap = teacherRatings.reduce((acc, rating) => {
+      const avgOverall =
+        ((rating._avg.freebie || 0) +
+          (rating._avg.friendliness || 0) +
+          (rating._avg.experienced || 0) +
+          (rating._avg.strictness || 0) +
+          (rating._avg.smartless || 0)) /
+        5;
+
+      acc[rating.teacherId] = {
+        avgRating: avgOverall,
+        countTeacherReviews: rating._count,
+      };
+      return acc;
+    }, {});
+
+    const formattedTeachers = teachers
+    .map((teacher) => ({
+      id: teacher.id,
+      fullName: teacher.fullName,
+      subject: teacher.subject.title,
+      photo: teacher.photo,
+      avgRating: Math.round(ratingsMap[teacher.id]?.avgRating) || 0, // Если нет отзывов, ставим 0
+      countTeacherReviews: ratingsMap[teacher.id]?.countTeacherReviews || 0,
+    }))
+    .filter((teacher) =>
+      minRating !== undefined || maxRating !== undefined
+        ? teacher.avgRating >= minRating || teacher.avgRating <= maxRating
+        : true
+    );
+
 
     const nextCursor = teachers.length < limit ? null : cursor + limit;
 
     return {
-      data: teachers.map((teacher) => ({
-        ...teacher,
-        subject: teacher.subject.title,
-        avgRating: 1123,
-        subjectId: undefined,
-        teacherReview: undefined,
-      })),
+      data: formattedTeachers,
       nextCursor,
     };
   }
