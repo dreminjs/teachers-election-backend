@@ -184,7 +184,13 @@ export class TeacherController {
       fullName,
       subject: title,
       photo,
-      avgRatings: { freebie, friendliness, experienced, smartless, strictness },
+      avgRatings: {
+        freebie: Math.round(freebie),
+        friendliness: Math.round(friendliness),
+        experienced: Math.round(experienced),
+        smartless: Math.round(smartless),
+        strictness: Math.round(strictness),
+      },
       countTeacherReviews,
     };
   }
