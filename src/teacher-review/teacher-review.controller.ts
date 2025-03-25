@@ -23,6 +23,7 @@ import {
   ExtendedTeacherReview,
   ExtendedTeacherReviewResponse,
 } from './interfaces/teacher.interface';
+import { PrismaService } from 'src/prisma';
 
 @UseGuards(AccessTokenGuard)
 @Controller('teacher-reviews')
@@ -38,9 +39,12 @@ export class TeacherReviewController {
     @Body() body: CreateTeacherReviewDto
   ): Promise<TeacherReview> {
     return this.teacherReviewService.createOne({
-      ...body,
+      freebie: body.freebie,
+      friendliness: body.friendliness,
+      smartless: body.smartless,
+      strictness: body.strictness,
+      experienced: body.experienced,
       isChecked: false,
-
       user: { connect: { id: userId } },
       teacher: {
         connect: { id: body.teacherId },
@@ -74,15 +78,20 @@ export class TeacherReviewController {
 
     const nextCursor = teachersReviews.length < limit ? null : cursor + limit;
 
-    const reviewIds = teachersReviews ? teachersReviews?.map((review) => review.id) : []
+    const reviewIds = teachersReviews
+      ? teachersReviews?.map((review) => review.id)
+      : [];
 
     const likesCounts = await this.likeService.groupBy(reviewIds);
 
-    const likesMap = likesCounts.reduce((acc, { teacherReviewId, _count }) => {
-      acc[teacherReviewId] = _count.teacherReviewId;
-      return acc;
-    }, {} as Record<string, number>);
-  
+    const likesMap = likesCounts.reduce(
+      (acc, { teacherReviewId, _count }) => {
+        acc[teacherReviewId] = _count.teacherReviewId;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+
     return {
       data: teachersReviews.map((el) => ({
         ...el,
@@ -90,7 +99,7 @@ export class TeacherReviewController {
           nickName: el.user.nickName,
           id: el.userId,
         },
-        likesCount:likesMap[el.id] || 0,
+        likesCount: likesMap[el.id] || 0,
         userId: undefined,
       })),
       nextCursor,
