@@ -122,10 +122,7 @@ export class TeacherController {
       data: teachers.map((teacher) => ({
         ...teacher,
         subject: teacher.subject.title,
-        avgRating: calculateAverageRating(
-          teacher.teacherReview.map((el) => el.grade)
-        ),
-        
+        avgRating: 1123,
         subjectId: undefined,
         teacherReview: undefined,
       })),
@@ -159,7 +156,6 @@ export class TeacherController {
       {
         fullName,
         photo,
-        teacherReview,
         subject: { title },
       },
       countTeacherReviews
@@ -170,7 +166,7 @@ export class TeacherController {
       fullName,
       subject: title,
       photo,
-      avgRating: calculateAverageRating(teacherReview.map((el) => el.grade)),
+      avgRating:123, 
       countTeacherReviews,
     };
   }

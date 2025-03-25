@@ -67,7 +67,7 @@ export class TeacherReviewController {
       },
       where: {
         teacher: { id: teacherId },
-        isChecked: isChecked || false,
+        isChecked,
         ...(includeComments ? { message: { not: null } } : {}),
       },
     })) as ExtendedTeacherReview[];
@@ -83,7 +83,6 @@ export class TeacherReviewController {
       return acc;
     }, {} as Record<string, number>);
   
-
     return {
       data: teachersReviews.map((el) => ({
         ...el,
@@ -103,7 +102,7 @@ export class TeacherReviewController {
     await this.teacherReviewService.deleteOne({ id });
   }
 
-  @UseGuards(RolesGuard, AccessTokenGuard)
+  @UseGuards(RolesGuard)
   @AllowedRoles(Roles.ADMIN)
   @Put('/approve/:id')
   async approve(@Param('id') id: string): Promise<TeacherReview> {
@@ -113,7 +112,7 @@ export class TeacherReviewController {
     );
   }
 
-  @UseGuards(RolesGuard, AccessTokenGuard)
+  @UseGuards(RolesGuard)
   @AllowedRoles(Roles.ADMIN)
   @Put('/unapprove/:id')
   async unapprove(@Param('id') id: string): Promise<TeacherReview> {
@@ -123,7 +122,6 @@ export class TeacherReviewController {
     );
   }
 
-  @UseGuards(AccessTokenGuard)
   @Post('/like')
   public async like(
     @CurrentUser('id') userId: string,
@@ -137,7 +135,7 @@ export class TeacherReviewController {
     });
   }
 
-  @UseGuards(AccessTokenGuard, LikeOwnerGuard)
+  @UseGuards(LikeOwnerGuard)
   @Delete(':likeId')
   public async unlike(
     @Param('likeId') likeId: string
