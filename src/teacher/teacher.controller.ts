@@ -152,9 +152,7 @@ export class TeacherController {
       },
     });
 
-    const {
-      _avg: { freebie, friendliness, experienced, smartless, strictness },
-    } = await this.teacherReviewServce.aggregate({
+    const avgRaingsQuery = this.teacherReviewServce.aggregate({
       where: { teacherId: id },
       _avg: {
         freebie: true,
@@ -171,8 +169,15 @@ export class TeacherController {
         photo,
         subject: { title },
       },
+      {
+        _avg: { freebie, friendliness, experienced, smartless, strictness },
+      },
       countTeacherReviews,
-    ] = await Promise.all([teacherQuery, countTeacherReviewsQuery]);
+    ] = await Promise.all([
+      teacherQuery,
+      avgRaingsQuery,
+      countTeacherReviewsQuery,
+    ]);
 
     return {
       id,
