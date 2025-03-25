@@ -95,10 +95,12 @@ export class TeacherController {
       limit,
       search,
       subjectIds,
-      thresholdRating,
-      rating,
+      minRating,
+      maxRating,
     }: GetTeachersQueryParameters
-  ): Promise<IInfiniteScrollResponse<ITeacherExtendedResponse>> {
+  ): Promise<
+    IInfiniteScrollResponse<Omit<ITeacherExtendedResponse, 'teacherReviews'>>
+  > {
     const teachers = (await this.teacherService.findMany({
       take: limit,
       where: {
@@ -111,7 +113,6 @@ export class TeacherController {
             title: true,
           },
         },
-       
       },
       skip: cursor,
     })) as ITeacherExtended[];
@@ -140,7 +141,6 @@ export class TeacherController {
             title: true,
           },
         },
-     
       },
     }) as Promise<ITeacherExtended>;
 
@@ -152,13 +152,26 @@ export class TeacherController {
       },
     });
 
+    const {
+      _avg: { freebie, friendliness, experienced, smartless, strictness },
+    } = await this.teacherReviewServce.aggregate({
+      where: { teacherId: id },
+      _avg: {
+        freebie: true,
+        smartless: true,
+        strictness: true,
+        experienced: true,
+        friendliness: true,
+      },
+    });
+
     const [
       {
         fullName,
         photo,
         subject: { title },
       },
-      countTeacherReviews
+      countTeacherReviews,
     ] = await Promise.all([teacherQuery, countTeacherReviewsQuery]);
 
     return {
@@ -166,7 +179,9 @@ export class TeacherController {
       fullName,
       subject: title,
       photo,
-      avgRating:123, 
+      avgRating: Math.round(
+        (freebie + friendliness + experienced + smartless + strictness) / 5
+      ),
       countTeacherReviews,
     };
   }

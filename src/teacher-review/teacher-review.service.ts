@@ -30,4 +30,9 @@ export class TeacherReviewService {
   async count(args: Prisma.TeacherReviewCountArgs) {
     return await this.prisma.teacherReview.count(args)
   }
+
+  async aggregate(args:Prisma.TeacherReviewAggregateArgs) {
+    return await this.prisma.teacherReview.aggregate(args)
+  }
+
 }
