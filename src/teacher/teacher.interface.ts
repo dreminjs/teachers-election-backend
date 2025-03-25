@@ -1,5 +1,6 @@
 import { Subject, TeacherReview } from '@prisma/client';
 import { Teacher } from '@prisma/client';
+import { ITeacherReviewCreateries } from 'src/shared';
 
 
 export interface ITeacherExtended extends Teacher {
@@ -9,7 +10,7 @@ export interface ITeacherExtended extends Teacher {
 
 export interface ITeacherExtendedResponse {
   subject: string;
-  avgRating: any
+  avgRatings: ITeacherReviewCreateries
   id: string
   fullName: string
   photo: string

@@ -99,7 +99,7 @@ export class TeacherController {
       maxRating,
     }: GetTeachersQueryParameters
   ): Promise<
-    IInfiniteScrollResponse<Omit<ITeacherExtendedResponse, 'teacherReviews'>>
+    IInfiniteScrollResponse<Omit<ITeacherExtendedResponse, 'avgRatings'>>
   > {
     const teachers = (await this.teacherService.findMany({
       take: limit,
@@ -179,9 +179,7 @@ export class TeacherController {
       fullName,
       subject: title,
       photo,
-      avgRating: Math.round(
-        (freebie + friendliness + experienced + smartless + strictness) / 5
-      ),
+      avgRatings: { freebie, friendliness, experienced, smartless, strictness },
       countTeacherReviews,
     };
   }
