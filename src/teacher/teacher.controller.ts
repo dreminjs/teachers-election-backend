@@ -101,7 +101,7 @@ export class TeacherController {
       where: {
         ...(search ? { fullName: { contains: search } } : {}),
         ...(subjectIds ? { subjectId: { in: subjectIds } } : {}),
-        
+
       },
       include: {
         subject: {
@@ -130,13 +130,7 @@ export class TeacherController {
 
     const enhancedTeachers = teachers.map((teacher) => ({
       ...teacher,
-      avgRatings: ratingsMap.get(teacher.id) || {
-        freebie: 0,
-        friendliness: 0,
-        experienced: 0,
-        smartless: 0,
-        strictness: 0,
-      },
+      avgRatings: ratingsMap.get(teacher.id) || null,
     }));
 
     const nextCursor = enhancedTeachers.length < limit ? null : cursor + limit;

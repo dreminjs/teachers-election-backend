@@ -8,7 +8,7 @@ export interface ITeacherExtended extends Teacher {
 
 export interface ITeacherExtendedResponse {
   subject: string;
-  avgRatings: ITeacherReviewCreateries;
+  avgRatings: ITeacherReviewCreateries | null
   id: string;
   fullName: string;
   photo: string;
