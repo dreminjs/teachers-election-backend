@@ -100,8 +100,7 @@ export class TeacherController {
       skip: cursor,
       where: {
         ...(search ? { fullName: { contains: search } } : {}),
-        ...(subjectIds ? { subjectId: { in: subjectIds } } : {}),
-
+        ...(subjectIds ? { subjectId: { in: subjectIds } } : {})
       },
       include: {
         subject: {
@@ -124,6 +123,7 @@ export class TeacherController {
           experienced: Math.round(item._avg.experienced || 0),
           smartless: Math.round(item._avg.smartless || 0),
           strictness: Math.round(item._avg.strictness || 0),
+          avgRatings: Number(item._avg.avgRating.toFixed(2)) || 0
         },
       ])
     );  

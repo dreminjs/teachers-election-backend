@@ -52,20 +52,8 @@ export class TeacherReviewService {
         strictness: true,
         experienced: true,
         friendliness: true,
+        avgRating: true
       },
     });
   }
-
-  // DOESN'T BEST PRACTICE
-  // async groupBy(args: { by: string[] }) {
-  //   return await this.prisma.teacherReview.groupBy({
-  //     _avg: {
-  //       freebie: true,
-  //       smartless: true,
-  //       strictness: true,
-  //       experienced: true,
-  //       friendliness: true,
-  //     },
-  //   });
-  // }
 }

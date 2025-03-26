@@ -36,18 +36,28 @@ export class TeacherReviewController {
   @Post()
   async createOne(
     @CurrentUser('id') userId: string,
-    @Body() body: CreateTeacherReviewDto
+    @Body()
+    {
+      freebie,
+      friendliness,
+      smartless,
+      experienced,
+      strictness,
+      teacherId,
+    }: CreateTeacherReviewDto
   ): Promise<TeacherReview> {
     return this.teacherReviewService.createOne({
-      freebie: body.freebie,
-      friendliness: body.friendliness,
-      smartless: body.smartless,
-      strictness: body.strictness,
-      experienced: body.experienced,
+      freebie,
+      friendliness,
+      smartless,
+      strictness,
+      experienced,
+      avgRating:
+        (freebie + friendliness + smartless + experienced + strictness) / 5,
       isChecked: false,
       user: { connect: { id: userId } },
       teacher: {
-        connect: { id: body.teacherId },
+        connect: { id: teacherId },
       },
     });
   }
