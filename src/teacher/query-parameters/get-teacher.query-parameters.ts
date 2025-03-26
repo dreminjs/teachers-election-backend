@@ -1,12 +1,48 @@
 import { Type } from 'class-transformer';
 
 export class GetTeachersQueryParameters {
+  // Фильтрация по предметам
   subjectIds?: string[];
+
+  // Фильтры по общему рейтингу (устаревшие, если нужны только minAvgRating/maxAvgRating, можно удалить)
+
+
+  // Фильтры по общему среднему рейтингу
   @Type(() => Number)
-  minRating?: number; // рейтинг которого нельзя низже выставитьк
+  minAvgRating?: number;
   @Type(() => Number)
-  maxRating?: number; // рейтинг
-  search?: string; // имя учителя
+  maxAvgRating?: number;
+
+  // Фильтры для конкретных критериев
+  @Type(() => Number)
+  minFreebieRating?: number;
+  @Type(() => Number)
+  maxFreebieRating?: number;
+
+  @Type(() => Number)
+  minFriendlinessRating?: number;
+  @Type(() => Number)
+  maxFriendlinessRating?: number;
+
+  @Type(() => Number)
+  minExperiencedRating?: number;
+  @Type(() => Number)
+  maxExperiencedRating?: number;
+
+  @Type(() => Number)
+  minStrictnessRating?: number;
+  @Type(() => Number)
+  maxStrictnessRating?: number;
+
+  @Type(() => Number)
+  minSmartlessRating?: number;
+  @Type(() => Number)
+  maxSmartlessRating?: number;
+
+  // Фильтрация по имени учителя
+  search?: string;
+
+  // Пагинация
   @Type(() => Number)
   public cursor: number = 0;
   @Type(() => Number)

@@ -38,19 +38,34 @@ export class TeacherReviewService {
     return await this.prisma.teacherReview.aggregate(args);
   }
 
+  async findManyAvgRatings(teachersIds:string[]) {
+    return await this.prisma.teacherReview.groupBy({
+      by: ["teacherId"],
+      where: {
+        teacherId: {
+          in: teachersIds,
+        },
+      },
+      _avg: {
+        freebie: true,
+        smartless: true,
+        strictness: true,
+        experienced: true,
+        friendliness: true,
+      },
+    });
+  }
 
   // DOESN'T BEST PRACTICE
-  async groupBy(args: {
-    by: 'teacherId'[];
-    _avg: {
-      freebie: true;
-      friendliness: true;
-      experienced: true;
-      strictness: true;
-      smartless: true;
-    };
-    _count: true;
-  }) {
-    return await this.prisma.teacherReview.groupBy(args);
-  }
+  // async groupBy(args: { by: string[] }) {
+  //   return await this.prisma.teacherReview.groupBy({
+  //     _avg: {
+  //       freebie: true,
+  //       smartless: true,
+  //       strictness: true,
+  //       experienced: true,
+  //       friendliness: true,
+  //     },
+  //   });
+  // }
 }

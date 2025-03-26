@@ -24,8 +24,8 @@ export class LikeService {
   async groupBy(reviewIds: string[]) {
     return await this.prisma.like.groupBy({
       by: ['teacherReviewId'],
-      _count: { teacherReviewId: true }, // Считаем количество лайков для каждого отзыва
-      where: { teacherReviewId: { in: reviewIds } }, // Фильтруем только нужные отзывы
+      _count: { teacherReviewId: true },
+      where: { teacherReviewId: { in: reviewIds } },
     });
   }
 }

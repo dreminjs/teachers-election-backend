@@ -1,7 +1,4 @@
 
-
-
-
 export interface ITeacherReviewCreateries {
     freebie: number | null,
     strictness: number | null,

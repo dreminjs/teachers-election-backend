@@ -12,6 +12,7 @@ import {
   Query,
   Req,
   UseGuards,
+
   UseInterceptors,
 } from '@nestjs/common';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
@@ -92,82 +93,56 @@ export class TeacherController {
   @Get()
   async findMany(
     @Query()
-    {
-      cursor,
-      limit,
-      search,
-      subjectIds,
-      minRating,
-      maxRating,
-    }: GetTeachersQueryParameters
-  ): Promise<
-    IInfiniteScrollResponse<Omit<ITeacherExtendedResponse, 'avgRatings'>>
-  > {
+    { cursor, limit, search, subjectIds, ...dto }: GetTeachersQueryParameters
+  ): Promise<IInfiniteScrollResponse<ITeacherExtended>> {
     const teachers = (await this.teacherService.findMany({
       take: limit,
       skip: cursor,
       where: {
         ...(search ? { fullName: { contains: search } } : {}),
         ...(subjectIds ? { subjectId: { in: subjectIds } } : {}),
+        
       },
       include: {
         subject: {
           select: {
             title: true,
+            id: true,
           },
         },
       },
     })) as ITeacherExtended[];
 
-    const teacherRatings = await this.prisma.teacherReview.groupBy({
-      by: ['teacherId'],
-      _avg: {
-        freebie: true,
-        friendliness: true,
-        experienced: true,
-        strictness: true,
-        smartless: true,
+    const avgRatings = await this.teacherReviewServce.findManyAvgRatings([...(teachers.map((el) => el.id))])
+
+    const ratingsMap = new Map(
+      avgRatings.map((item) => [
+        item.teacherId,
+        {
+          freebie: Math.round(item._avg.freebie || 0),
+          friendliness: Math.round(item._avg.friendliness || 0),
+          experienced: Math.round(item._avg.experienced || 0),
+          smartless: Math.round(item._avg.smartless || 0),
+          strictness: Math.round(item._avg.strictness || 0),
+        },
+      ])
+    );  
+
+    const enhancedTeachers = teachers.map((teacher) => ({
+      ...teacher,
+      avgRatings: ratingsMap.get(teacher.id) || {
+        freebie: 0,
+        friendliness: 0,
+        experienced: 0,
+        smartless: 0,
+        strictness: 0,
       },
-      _count: true,
-    });
+    }));
 
-
-    const ratingsMap = teacherRatings.reduce((acc, rating) => {
-      const avgOverall =
-        ((rating._avg.freebie || 0) +
-          (rating._avg.friendliness || 0) +
-          (rating._avg.experienced || 0) +
-          (rating._avg.strictness || 0) +
-          (rating._avg.smartless || 0)) /
-        5;
-
-      acc[rating.teacherId] = {
-        avgRating: avgOverall,
-        countTeacherReviews: rating._count,
-      };
-      return acc;
-    }, {});
-
-    const formattedTeachers = teachers
-    .map((teacher) => ({
-      id: teacher.id,
-      fullName: teacher.fullName,
-      subject: teacher.subject.title,
-      photo: teacher.photo,
-      avgRating: Math.round(ratingsMap[teacher.id]?.avgRating) || 0, // Если нет отзывов, ставим 0
-      countTeacherReviews: ratingsMap[teacher.id]?.countTeacherReviews || 0,
-    }))
-    .filter((teacher) =>
-      minRating !== undefined || maxRating !== undefined
-        ? teacher.avgRating >= minRating || teacher.avgRating <= maxRating
-        : true
-    );
-
-
-    const nextCursor = teachers.length < limit ? null : cursor + limit;
+    const nextCursor = enhancedTeachers.length < limit ? null : cursor + limit;
 
     return {
-      data: formattedTeachers,
+      data: enhancedTeachers,
       nextCursor,
     };
   }
@@ -207,8 +182,8 @@ export class TeacherController {
     const [
       {
         fullName,
-        photo,
         subject: { title },
+        ...dto
       },
       {
         _avg: { freebie, friendliness, experienced, smartless, strictness },
@@ -224,7 +199,7 @@ export class TeacherController {
       id,
       fullName,
       subject: title,
-      photo,
+      photo: dto?.photo ? dto.photo : null,
       avgRatings: {
         freebie: Math.round(freebie),
         friendliness: Math.round(friendliness),
