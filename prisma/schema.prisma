@@ -7,14 +7,6 @@ datasource db {
   url      = env("REMOTE_DATABASE_URL")
 }
 
-model Teacher {
-  id            String          @id @default(uuid())
-  fullName      String
-  photo         String
-  subject       Subject         @relation(fields: [subjectId], references: [id])
-  subjectId     String         
-  teacherReview TeacherReview[]
-}
 
 model User {
   id            String          @id @default(uuid())
@@ -28,6 +20,16 @@ model User {
   TeacherReview TeacherReview[]
 }
 
+
+model Teacher {
+  id            String          @id @default(uuid())
+  fullName      String
+  photo         String
+  subject       Subject         @relation(fields: [subjectId], references: [id])
+  subjectId     String         
+  teacherReview TeacherReview[]
+}
+
 model TeacherReview {
   id           String  @id @default(uuid())
   message      String?
@@ -37,6 +39,7 @@ model TeacherReview {
   experienced  Int
   strictness   Int
   smartless    Int
+  avgRating    Float @default(0) 
   Like         Like[]
   userId       String
   user         User    @relation(fields: [userId], references: [id])
