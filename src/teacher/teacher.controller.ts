@@ -41,8 +41,7 @@ export class TeacherController {
   constructor(
     private readonly teacherService: TeacherService,
     private readonly minioClientService: MinioClientService,
-    private readonly teacherReviewServce: TeacherReviewService,
-    private readonly prisma: PrismaService
+    private readonly teacherReviewServce: TeacherReviewService
   ) {}
 
   @UseInterceptors(FileInterceptor('file'), MinioFileUploadInterceptor)
@@ -105,8 +104,8 @@ export class TeacherController {
               teacherReview: {
                 some: {
                   avgRating: {
-                    ...(dto.minAvgRating ? { gte: dto.minAvgRating } : {}), 
-                    ...(dto.maxAvgRating ? { lte: dto.maxAvgRating } : {}), 
+                    ...(dto.minAvgRating ? { gte: dto.minAvgRating } : {}),
+                    ...(dto.maxAvgRating ? { lte: dto.maxAvgRating } : {}),
                   },
                 },
               },
@@ -123,9 +122,9 @@ export class TeacherController {
       },
     })) as ITeacherExtended[];
 
-   // const avgRatings = await this.teacherReviewServce.findManyAvgRatings([
-   //   ...teachers.map((el) => el.id),
-   // ]);
+    // const avgRatings = await this.teacherReviewServce.findManyAvgRatings([
+    //   ...teachers.map((el) => el.id),
+    // ]);
 
     const ratingsMap = new Map(
       [].map((item) => [
@@ -204,7 +203,7 @@ export class TeacherController {
 
     return {
       id,
-      fullName,
+      fullName: fullName ? fullName : 'anon',
       subject: title,
       photo: dto?.photo ? dto.photo : null,
       avgRatings: {
