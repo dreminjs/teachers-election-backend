@@ -43,6 +43,7 @@ export class TeacherReviewController {
       experienced,
       strictness,
       teacherId,
+      message,
     }: CreateTeacherReviewDto
   ): Promise<TeacherReview> {
     return this.teacherReviewService.createOne({
@@ -51,6 +52,7 @@ export class TeacherReviewController {
       smartless,
       strictness,
       experienced,
+      message,
       avgRating:
         (freebie + friendliness + smartless + experienced + strictness) / 5,
       isChecked: false,

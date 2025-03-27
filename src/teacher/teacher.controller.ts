@@ -5,23 +5,19 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Logger,
   Param,
   Patch,
   Post,
   Query,
-  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { TeacherService } from './teacher.service';
 import { Roles, Teacher } from '@prisma/client';
-import { File } from '../shared';
 import { IInfiniteScrollResponse } from 'src/shared';
 import { GetTeachersQueryParameters } from './query-parameters/get-teacher.query-parameters';
 import { AccessTokenGuard } from 'src/token';
-import { calculateAverageRating } from './model/calculateAvgRating';
 import type {
   ITeacherExtended,
   ITeacherExtendedResponse,
