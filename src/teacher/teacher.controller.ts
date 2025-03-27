@@ -123,12 +123,12 @@ export class TeacherController {
       },
     })) as ITeacherExtended[];
 
-    const avgRatings = await this.teacherReviewServce.findManyAvgRatings([
-      ...teachers.map((el) => el.id),
-    ]);
+   // const avgRatings = await this.teacherReviewServce.findManyAvgRatings([
+   //   ...teachers.map((el) => el.id),
+   // ]);
 
     const ratingsMap = new Map(
-      avgRatings.map((item) => [
+      [].map((item) => [
         item.teacherId,
         {
           freebie: Math.round(item._avg.freebie || 0),
