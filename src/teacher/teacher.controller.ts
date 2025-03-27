@@ -12,7 +12,6 @@ import {
   Query,
   Req,
   UseGuards,
-
   UseInterceptors,
 } from '@nestjs/common';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
@@ -100,7 +99,19 @@ export class TeacherController {
       skip: cursor,
       where: {
         ...(search ? { fullName: { contains: search } } : {}),
-        ...(subjectIds ? { subjectId: { in: subjectIds } } : {})
+        ...(subjectIds ? { subjectId: { in: subjectIds } } : {}),
+        ...(dto.minAvgRating || dto.maxAvgRating
+          ? {
+              teacherReview: {
+                some: {
+                  avgRating: {
+                    ...(dto.minAvgRating ? { gte: dto.minAvgRating } : {}), 
+                    ...(dto.maxAvgRating ? { lte: dto.maxAvgRating } : {}), 
+                  },
+                },
+              },
+            }
+          : {}),
       },
       include: {
         subject: {
@@ -112,7 +123,9 @@ export class TeacherController {
       },
     })) as ITeacherExtended[];
 
-    const avgRatings = await this.teacherReviewServce.findManyAvgRatings([...(teachers.map((el) => el.id))])
+    const avgRatings = await this.teacherReviewServce.findManyAvgRatings([
+      ...teachers.map((el) => el.id),
+    ]);
 
     const ratingsMap = new Map(
       avgRatings.map((item) => [
@@ -123,10 +136,10 @@ export class TeacherController {
           experienced: Math.round(item._avg.experienced || 0),
           smartless: Math.round(item._avg.smartless || 0),
           strictness: Math.round(item._avg.strictness || 0),
-          avgRatings: Number(item._avg.avgRating.toFixed(2)) || 0
+          avgRatings: Number(item._avg.avgRating.toFixed(2)) || 0,
         },
       ])
-    );  
+    );
 
     const enhancedTeachers = teachers.map((teacher) => ({
       ...teacher,

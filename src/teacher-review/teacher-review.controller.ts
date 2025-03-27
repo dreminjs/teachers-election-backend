@@ -23,7 +23,6 @@ import {
   ExtendedTeacherReview,
   ExtendedTeacherReviewResponse,
 } from './interfaces/teacher.interface';
-import { PrismaService } from 'src/prisma';
 
 @UseGuards(AccessTokenGuard)
 @Controller('teacher-reviews')
