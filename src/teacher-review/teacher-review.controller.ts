@@ -82,7 +82,7 @@ export class TeacherReviewController {
       },
       where: {
         teacher: { id: teacherId },
-        isChecked,
+        ...(isChecked !== undefined ? { isChecked } : {}),
         ...(includeComments ? { message: { not: null } } : {}),
       },
     })) as ExtendedTeacherReview[];
