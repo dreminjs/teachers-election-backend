@@ -19,22 +19,22 @@ export class SigninGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const { email, password } = context.switchToHttp().getRequest().body;
 
-    const { password: hashPassword, id: userId } =
+    const user =
       await this.userService.findOne({
         where: { email },
       });
 
-    if (!hashPassword)
+    if (!user)
       throw new HttpException(
         'Такой пользователь не существует',
         HttpStatus.BAD_REQUEST
       );
 
-    const deleteTokenQuery = this.tokenService.deleteOne({ userId });
+    const deleteTokenQuery = this.tokenService.deleteOne({ userId: user.id });
 
     const isPasswordValidQuery = comparePassword({
       password,
-      hashPassword,
+      hashPassword: user.password,
     });
 
     const [_, isPasswordValid] = await Promise.all([

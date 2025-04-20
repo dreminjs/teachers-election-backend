@@ -29,7 +29,6 @@ import { MinioFileName } from 'src/minio-client/minio-file-name.decorator';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { TeacherReviewService } from 'src/teacher-review/teacher-review.service';
-import { PrismaService } from 'src/prisma';
 
 @UseGuards(AccessTokenGuard)
 @Controller('teachers')
