@@ -72,6 +72,16 @@ export class TeacherReviewController {
       cursor,
       limit,
       includeComments,
+      minFreebie,
+      maxFreebie,
+      minFriendliness,
+      maxFriendliness,
+      minExperienced,
+      maxExperienced,
+      minStrictness,
+      maxStrictness,
+      minSmartless,
+      maxSmartless,
     }: GetTeacherReviewsQueryParameters
   ): Promise<IInfiniteScrollResponse<ExtendedTeacherReviewResponse>> {
     const teachersReviews = (await this.teacherReviewService.findMany({
@@ -84,17 +94,27 @@ export class TeacherReviewController {
         teacher: { id: teacherId },
         ...(isChecked !== undefined ? { isChecked } : {}),
         ...(includeComments ? { message: { not: null } } : {}),
+        ...(minFreebie !== undefined ? { freebie: { gte: minFreebie } } : {}),
+        ...(maxFreebie !== undefined ? { freebie: { lte: maxFreebie } } : {}),
+        ...(minFriendliness !== undefined ? { friendliness: { gte: minFriendliness } } : {}),
+        ...(maxFriendliness !== undefined ? { friendliness: { lte: maxFriendliness } } : {}),
+        ...(minExperienced !== undefined ? { experienced: { gte: minExperienced } } : {}),
+        ...(maxExperienced !== undefined ? { experienced: { lte: maxExperienced } } : {}),
+        ...(minStrictness !== undefined ? { strictness: { gte: minStrictness } } : {}),
+        ...(maxStrictness !== undefined ? { strictness: { lte: maxStrictness } } : {}),
+        ...(minSmartless !== undefined ? { smartless: { gte: minSmartless } } : {}),
+        ...(maxSmartless !== undefined ? { smartless: { lte: maxSmartless } } : {}),
       },
     })) as ExtendedTeacherReview[];
-
+  
     const nextCursor = teachersReviews.length < limit ? null : cursor + limit;
-
+  
     const reviewIds = teachersReviews
       ? teachersReviews?.map((review) => review.id)
       : [];
-
+  
     const likesCounts = await this.likeService.groupBy(reviewIds);
-
+  
     const likesMap = likesCounts.reduce(
       (acc, { teacherReviewId, _count }) => {
         acc[teacherReviewId] = _count.teacherReviewId;
@@ -102,7 +122,7 @@ export class TeacherReviewController {
       },
       {} as Record<string, number>
     );
-
+  
     return {
       data: teachersReviews.map((el) => ({
         ...el,
