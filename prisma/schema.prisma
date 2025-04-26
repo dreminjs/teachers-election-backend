@@ -10,7 +10,7 @@ datasource db {
 
 model User {
   id            String          @id @default(uuid())
-  nickName      String?
+  nickName      String?         @map("nickname")
   role          Roles
   email         String          @unique
   salt          String
@@ -38,26 +38,26 @@ model TeacherReview {
   friendliness Int
   experienced  Int
   strictness   Int
-  smartless    Int
-  avgRating    Float @default(0) 
+  smartless    Int 
+  avgRating    Float @default(0) @map("avg_rating")
   Like         Like[]
-  userId       String
+  userId       String  @map("user_id")
   user         User    @relation(fields: [userId], references: [id])
   teacher      Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-  teacherId    String
+  teacherId    String  @map("teacher_id")
 }
 
 model RefreshToken {
   id     String @id @default(uuid())
   token  String
-  userId String @unique
+  userId String @unique @map("user_id")
   user   User   @relation(fields: [userId], references: [id])
 }
 
 model Like {
   id              String        @id @default(uuid())
   userId          String
-  teacherReviewId String
+  teacherReviewId String        @map("user_id")
   teacherReview   TeacherReview @relation(fields: [teacherReviewId], references: [id])
   user            User          @relation(fields: [userId], references: [id])
 }

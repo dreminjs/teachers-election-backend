@@ -29,18 +29,11 @@ export class SigninGuard implements CanActivate {
         'Такой пользователь не существует',
         HttpStatus.BAD_REQUEST
       );
-
-    const deleteTokenQuery = this.tokenService.deleteOne({ userId: user.id });
-
-    const isPasswordValidQuery = comparePassword({
+      
+    const isPasswordValid = await comparePassword({
       password,
       hashPassword: user.password,
     });
-
-    const [_, isPasswordValid] = await Promise.all([
-      deleteTokenQuery,
-      isPasswordValidQuery,
-    ]);
 
     if (!isPasswordValid) {
       throw new HttpException('Неверная пара пароль', HttpStatus.BAD_REQUEST);

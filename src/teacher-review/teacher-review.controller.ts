@@ -54,7 +54,7 @@ export class TeacherReviewController {
       experienced,
       message,
       avgRating:
-        (freebie + friendliness + smartless + experienced + strictness) / 5,
+        (freebie + friendliness + smartless + experienced - strictness) / 5,
       isChecked: false,
       user: { connect: { id: userId } },
       teacher: {
