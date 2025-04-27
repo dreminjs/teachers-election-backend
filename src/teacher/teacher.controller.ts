@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { TeacherService } from './teacher.service';
-import { Roles, Teacher } from '@prisma/client';
+import { Prisma, Roles, Teacher } from '@prisma/client';
 import { IInfiniteScrollResponse } from 'src/shared';
 import { GetTeachersQueryParameters } from './query-parameters/get-teacher.query-parameters';
 import { AccessTokenGuard } from 'src/token';
@@ -29,6 +29,7 @@ import { MinioFileName } from 'src/minio-client/minio-file-name.decorator';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { TeacherReviewService } from 'src/teacher-review/teacher-review.service';
+import { PrismaService } from 'src/prisma';
 
 @UseGuards(AccessTokenGuard)
 @Controller('teachers')
@@ -36,7 +37,8 @@ export class TeacherController {
   constructor(
     private readonly teacherService: TeacherService,
     private readonly minioClientService: MinioClientService,
-    private readonly teacherReviewServce: TeacherReviewService
+    private readonly teacherReviewService: TeacherReviewService,
+    private readonly prisma: PrismaService
   ) {}
 
   @UseInterceptors(FileInterceptor('file'), MinioFileUploadInterceptor)
@@ -85,68 +87,106 @@ export class TeacherController {
 
   @Get()
   async findMany(
-    @Query()
-    { cursor, limit, search, subjectIds, ...dto }: GetTeachersQueryParameters
-  ): Promise<IInfiniteScrollResponse<ITeacherExtended>> {
-    const teachers = (await this.teacherService.findMany({
-      take: limit,
-      skip: cursor,
-      where: {
-        ...(search ? { fullName: { contains: search } } : {}),
-        ...(subjectIds ? { subjectId: { in: subjectIds } } : {}),
-        ...(dto.minAvgRating || dto.maxAvgRating
-          ? {
-              teacherReview: {
-                some: {
-                  avgRating: {
-                    ...(dto.minAvgRating ? { gte: dto.minAvgRating } : {}),
-                    ...(dto.maxAvgRating ? { lte: dto.maxAvgRating } : {}),
-                  },
-                },
-              },
-            }
-          : {}),
-      },
-      include: {
-        subject: {
-          select: {
-            title: true,
-            id: true,
-          },
-        },
-      },
-    })) as ITeacherExtended[];
-
-    // const avgRatings = await this.teacherReviewServce.findManyAvgRatings([
-    //   ...teachers.map((el) => el.id),
-    // ]);
-
-    const ratingsMap = new Map(
-      [].map((item) => [
-        item.teacherId,
-        {
-          freebie: Math.round(item._avg.freebie || 0),
-          friendliness: Math.round(item._avg.friendliness || 0),
-          experienced: Math.round(item._avg.experienced || 0),
-          smartless: Math.round(item._avg.smartless || 0),
-          strictness: Math.round(item._avg.strictness || 0),
-          avgRatings: Number(item._avg.avgRating.toFixed(2)) || 0,
-        },
-      ])
-    );
-
-    const enhancedTeachers = teachers.map((teacher) => ({
-      ...teacher,
-      avgRatings: ratingsMap.get(teacher.id) || null,
-    }));
-
-    const nextCursor = enhancedTeachers.length < limit ? null : cursor + limit;
-
-    return {
-      data: enhancedTeachers,
-      nextCursor,
-    };
+    @Query() queryParams: GetTeachersQueryParameters
+  ): Promise<any[]> {
+    const {
+      cursor: offset = 0,
+      limit = 10,
+      search,
+      subjectIds,
+      minAvgRating,
+      maxAvgRating,
+      minFreebie,
+      maxFreebie,
+      minFriendliness,
+      maxFriendliness,
+      minExperienced,
+      maxExperienced,
+      minStrictness,
+      maxStrictness,
+      minSmartless,
+      maxSmartless,
+      sortField = 'rating',
+      sortOrder = 'desc'
+    } = queryParams;
+  
+    // Явно преобразуем в числа
+    const numericLimit = Number(limit);
+    const numericOffset = Number(offset);
+  
+    // Строим условие ORDER BY
+    let orderByClause = 'AVG(tr.avg_rating) DESC NULLS LAST';
+    if (sortField && sortOrder) {
+      const sortFieldMap = {
+        freebie: 'AVG(tr.freebie)',
+        friendliness: 'AVG(tr.friendliness)',
+        experienced: 'AVG(tr.experienced)',
+        strictness: 'AVG(tr.strictness)',
+        smartless: 'AVG(tr.smartless)',
+        rating: 'AVG(tr.avg_rating)'
+      };
+      
+      const field = sortFieldMap[sortField] || 'AVG(tr.avg_rating)';
+      orderByClause = `${field} ${sortOrder.toUpperCase()} NULLS LAST`;
+    }
+  
+    const query = Prisma.sql`
+      SELECT 
+        t.id,
+        t.full_name,
+        t.photo,
+        t.subjet_id,
+        AVG(tr.freebie) AS avg_freebie,
+        AVG(tr.friendliness) AS avg_friendliness,
+        AVG(tr.experienced) AS avg_experienced,
+        AVG(tr.strictness) AS avg_strictness,
+        AVG(tr.smartless) AS avg_smartless,
+        AVG(tr.avg_rating) AS avg_rating,
+        COUNT(tr.id) AS review_count
+      FROM 
+        teachers t
+      LEFT JOIN 
+        teachers_reviews tr ON t.id = tr.teacher_id
+      WHERE 
+        (${search === null} OR t.full_name ILIKE '%' || ${search} || '%')
+        AND (${subjectIds === null} OR t.subjet_id = ANY(${subjectIds}))
+      GROUP BY 
+        t.id, t.full_name, t.photo, t.subjet_id
+      HAVING
+        (${minAvgRating === null} OR AVG(tr.avg_rating) >= ${minAvgRating})
+        AND (${maxAvgRating === null} OR AVG(tr.avg_rating) <= ${maxAvgRating})
+        AND (${minFreebie === null} OR AVG(tr.freebie) >= ${minFreebie})
+        AND (${maxFreebie === null} OR AVG(tr.freebie) <= ${maxFreebie})
+        AND (${minFriendliness === null} OR AVG(tr.friendliness) >= ${minFriendliness})
+        AND (${maxFriendliness === null} OR AVG(tr.friendliness) <= ${maxFriendliness})
+        AND (${minExperienced === null} OR AVG(tr.experienced) >= ${minExperienced})
+        AND (${maxExperienced === null} OR AVG(tr.experienced) <= ${maxExperienced})
+        AND (${minStrictness === null} OR AVG(tr.strictness) >= ${minStrictness})
+        AND (${maxStrictness === null} OR AVG(tr.strictness) <= ${maxStrictness})
+        AND (${minSmartless === null} OR AVG(tr.smartless) >= ${minSmartless})
+        AND (${maxSmartless === null} OR AVG(tr.smartless) <= ${maxSmartless})
+      ORDER BY 
+        ${Prisma.raw(orderByClause)}
+      LIMIT 
+        ${numericLimit}
+      OFFSET 
+        ${numericOffset}
+    `;
+  
+    try {
+      const result = await this.prisma.$queryRaw<any[]>(query);
+      return result;
+    } catch (error) {
+      console.error('Error executing query:', error);
+      throw new Error('Failed to fetch teachers');
+    }
   }
+
+  @Get("test")
+  public async test(){
+    return await this.teacherReviewService.groupBy({})
+  }
+
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<ITeacherExtendedResponse> {
@@ -161,7 +201,7 @@ export class TeacherController {
       },
     }) as Promise<ITeacherExtended>;
 
-    const countTeacherReviewsQuery = this.teacherReviewServce.count({
+    const countTeacherReviewsQuery = this.teacherReviewService.count({
       where: {
         teacher: {
           id,
@@ -169,7 +209,7 @@ export class TeacherController {
       },
     });
 
-    const avgRaingsQuery = this.teacherReviewServce.aggregate({
+    const avgRaingsQuery = this.teacherReviewService.aggregate({
       where: { teacherId: id },
       _avg: {
         freebie: true,

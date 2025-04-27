@@ -10,7 +10,7 @@ datasource db {
 
 model User {
   id            String          @id @default(uuid())
-  nickName      String?         @map("nickname")
+  nickName      String?         @map("nick_name")
   role          Roles
   email         String          @unique
   salt          String
@@ -18,22 +18,26 @@ model User {
   Like          Like[]
   RefreshToken  RefreshToken[]
   TeacherReview TeacherReview[]
+
+  @@map("users")
 }
 
 
 model Teacher {
   id            String          @id @default(uuid())
-  fullName      String
-  photo         String
+  fullName      String          @map("full_name")
+  photo         String    
   subject       Subject         @relation(fields: [subjectId], references: [id])
-  subjectId     String         
+  subjectId     String          @map("subjet_id")     
   teacherReview TeacherReview[]
+
+  @@map("teachers")
 }
 
 model TeacherReview {
   id           String  @id @default(uuid())
   message      String?
-  isChecked    Boolean
+  isChecked    Boolean @map("is_checked")
   freebie      Int
   friendliness Int
   experienced  Int
@@ -45,6 +49,9 @@ model TeacherReview {
   user         User    @relation(fields: [userId], references: [id])
   teacher      Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   teacherId    String  @map("teacher_id")
+
+  @@map("teachers_reviews")
+
 }
 
 model RefreshToken {
@@ -52,6 +59,8 @@ model RefreshToken {
   token  String
   userId String @unique @map("user_id")
   user   User   @relation(fields: [userId], references: [id])
+
+  @@map("refresh_tokens")
 }
 
 model Like {
@@ -60,13 +69,16 @@ model Like {
   teacherReviewId String        @map("user_id")
   teacherReview   TeacherReview @relation(fields: [teacherReviewId], references: [id])
   user            User          @relation(fields: [userId], references: [id])
+
+  @@map("likes")
 }
 
 model Subject {
   id        String    @id @default(uuid())
   title     String
-  createdAt DateTime  @default(now())
+  createdAt DateTime  @default(now()) @map("created_at")
   teacher   Teacher[] // Один предмет может быть у нескольких учителей
+  @@map("subjets")
 }
 
 enum Roles {

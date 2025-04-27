@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ITokens } from './interfaces/tokens.interface';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -11,7 +11,7 @@ export class TokenService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    private readonly prisma: PrismaService,
+    private readonly prisma: PrismaService
   ) {}
 
   async generateTokens({
@@ -21,28 +21,35 @@ export class TokenService {
     email: string;
     userId: string;
   }): Promise<ITokens> {
-    const refreshToken = this.jwtService.sign(
-      { email },
-      {
-        secret: this.configService.get('REFRESH_TOKEN_SECRET'),
-        expiresIn: '7d',
-      }
-    );
+    try {
+      const refreshToken = this.jwtService.sign(
+        { email, userId },
+        {
+          secret: this.configService.get('REFRESH_TOKEN_SECRET'),
+          expiresIn: '7d',
+        }
+      );
 
-    const accessToken = this.jwtService.sign(
-      { email },
-      {
-        secret: this.configService.get('ACCESS_TOKEN_SECRET'),
-        expiresIn: '1d',
-      }
-    );
+      const accessToken = this.jwtService.sign(
+        { email, userId },
+        {
+          secret: this.configService.get('ACCESS_TOKEN_SECRET'),
+          expiresIn: '1d',
+        }
+      );
 
-    await this.saveRefreshToken({
-      user: { connect: { id: userId } },
-      token: refreshToken,
-    });
+      // Сохраняем новый refresh-токен
+      await this.prisma.refreshToken.create({
+        data: {
+          token: refreshToken,
+          user: { connect: { id: userId } },
+        },
+      });
 
-    return { accessToken, refreshToken };
+      return { accessToken, refreshToken };
+    } catch (e) {
+      throw new HttpException("user already sign in",HttpStatus.BAD_REQUEST)
+    }
   }
 
   private async saveRefreshToken(
