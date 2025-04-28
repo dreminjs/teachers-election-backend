@@ -31,6 +31,7 @@ import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { TeacherReviewService } from 'src/teacher-review/teacher-review.service';
 import { PrismaService } from 'src/prisma';
+import { IInfiniteScrollResponse } from 'src/shared';
 
 @UseGuards(AccessTokenGuard)
 @Controller('teachers')
@@ -38,7 +39,7 @@ export class TeacherController {
   constructor(
     private readonly teacherService: TeacherService,
     private readonly minioClientService: MinioClientService,
-    private readonly teacherReviewService: TeacherReviewService,
+    private readonly teacherReviewService: TeacherReviewService
   ) {}
 
   private logger = new Logger(TeacherController.name);
@@ -90,8 +91,24 @@ export class TeacherController {
   }
 
   @Get()
-  public async findMany(@Query() query: GetTeachersQueryParameters): Promise<any[]>{
-    return await this.teacherService.findManyBySQL(query)
+  public async findMany(
+    @Query() query: GetTeachersQueryParameters
+  ): Promise<
+    IInfiniteScrollResponse<
+      Omit<ITeacherExtendedResponse, 'countTeacherReviews'>
+    >
+  > {
+    const teachersQuery = this.teacherService.findManyBySQL(query);
+
+    const [teachers] = await Promise.all([teachersQuery]);
+
+    const nextCursor =
+      teachers.length < query.limit ? null : query.cursor + query.limit;
+
+    return {
+      data: teachers,
+      nextCursor,
+    };
   }
 
   @Get('test')

@@ -57,7 +57,6 @@ export class SubjectController {
       return {
         items,
         count,
-        currentPage: page,
       };
     } else {
       const nextCursor = items.length < limit ? null : cursor + limit;

@@ -18,3 +18,5 @@ export interface ITeacherExtendedResponse {
   avgRatings: ITeacherReviewCreateries | null
   countTeacherReviews: number;
 }
+
+
