@@ -33,10 +33,10 @@ model Teacher {
 
 model TeacherSubject {
   id        String  @id @default(uuid())
-  subjectId String
+  subjectId String  @map("subject_id")
   subject   Subject @relation(fields: [subjectId], references: [id])
   Teacher   Teacher @relation(fields: [teacherId], references: [id])
-  teacherId String
+  teacherId String  @map("teacher_id")
   
   @@map("teachers_subjects")
 }

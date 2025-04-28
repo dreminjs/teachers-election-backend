@@ -15,6 +15,4 @@ export class GetTeachersQueryParameters {
   maxStrictness?: number;
   minSmartless?: number;
   maxSmartless?: number;
-  sortField?: 'freebie' | 'friendliness' | 'experienced' | 'strictness' | 'smartless' | 'rating';
-  sortOrder?: 'asc' | 'desc';
 }

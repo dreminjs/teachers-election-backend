@@ -28,7 +28,7 @@ export class SubjectService {
   }
 
   public async deleteOne(where: Prisma.SubjectWhereUniqueInput): Promise<void> {
-    await this.prisma.subject.delete({ where });
+    await this.prisma.subject.delete({where})
   }
 
   public async count(args: Prisma.SubjectCountArgs): Promise<number> {

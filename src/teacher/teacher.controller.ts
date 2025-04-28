@@ -39,7 +39,6 @@ export class TeacherController {
     private readonly teacherService: TeacherService,
     private readonly minioClientService: MinioClientService,
     private readonly teacherReviewService: TeacherReviewService,
-    private readonly prisma: PrismaService
   ) {}
 
   private logger = new Logger(TeacherController.name);
@@ -91,8 +90,8 @@ export class TeacherController {
   }
 
   @Get()
-  public async findMany(): Promise<Teacher[]>{
-    return await this.teacherService.findMany()
+  public async findMany(@Query() query: GetTeachersQueryParameters): Promise<any[]>{
+    return await this.teacherService.findManyBySQL(query)
   }
 
   @Get('test')
