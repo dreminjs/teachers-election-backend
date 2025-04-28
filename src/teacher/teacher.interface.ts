@@ -1,16 +1,20 @@
-import { Subject, TeacherReview } from '@prisma/client';
+import { Subject, TeacherSubject } from '@prisma/client';
 import { Teacher } from '@prisma/client';
 import { ITeacherReviewCreateries } from 'src/shared';
 
+export interface ITeacherSubjectExtended extends TeacherSubject {
+  subject: Subject
+}
+
 export interface ITeacherExtended extends Teacher {
-  subject: Omit<Subject, 'createdAt'>;
+    teacherSubjects: ITeacherSubjectExtended[]
 }
 
 export interface ITeacherExtendedResponse {
-  subject: string;
-  avgRatings: ITeacherReviewCreateries | null
   id: string;
   fullName: string;
   photo: string;
-  countTeacherReviews?: number;
+  subjects: Subject[];
+  avgRatings: ITeacherReviewCreateries | null
+  countTeacherReviews: number;
 }

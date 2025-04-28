@@ -32,7 +32,6 @@ export class SubjectController {
     return await this.subjectService.createOne(dto);
   }
 
-
   @Get()
   public async findMany(
     @Query() { limit, cursor, title, page }: IGetSubjectsQueryParameters
@@ -44,18 +43,15 @@ export class SubjectController {
       where: {
         ...(title && { title: { contains: title } }),
       },
-    })
+    });
 
     const itemsCountQuery = this.subjectService.count({
       where: {
         ...(title ? { title: { contains: title } } : {}),
       },
-    })
+    });
 
-    const [items, count] = await Promise.all([
-      itemsQuery,
-      itemsCountQuery,
-    ]);
+    const [items, count] = await Promise.all([itemsQuery, itemsCountQuery]);
 
     if (page) {
       return {
@@ -78,6 +74,15 @@ export class SubjectController {
   @Delete(':id')
   public async deleteOne(@Param('id') id: string): Promise<void> {
     await this.subjectService.deleteOne({ id });
+  }
+
+  @Get(':id')
+  public async findOne(@Param('id') id: string): Promise<Subject> {
+    return await this.subjectService.findOne({
+      where: {
+        id,
+      },
+    });
   }
 
   @UseGuards(SubjectGuard)

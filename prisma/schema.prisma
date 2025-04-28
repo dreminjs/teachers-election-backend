@@ -7,7 +7,6 @@ datasource db {
   url      = env("REMOTE_DATABASE_URL")
 }
 
-
 model User {
   id            String          @id @default(uuid())
   nickName      String?         @map("nick_name")
@@ -15,23 +14,40 @@ model User {
   email         String          @unique
   salt          String
   password      String
-  Like          Like[]
-  RefreshToken  RefreshToken[]
-  TeacherReview TeacherReview[]
+  Likes          Like[]
+  RefreshTokens  RefreshToken[]
+  TeacherReviews TeacherReview[]
 
   @@map("users")
 }
 
-
 model Teacher {
-  id            String          @id @default(uuid())
-  fullName      String          @map("full_name")
-  photo         String    
-  subject       Subject         @relation(fields: [subjectId], references: [id])
-  subjectId     String          @map("subjet_id")     
-  teacherReview TeacherReview[]
+  id             String           @id @default(uuid())
+  fullName       String           @map("full_name")
+  photo          String
+  teacherReviews  TeacherReview[]
+  teacherSubjects TeacherSubject[]
 
   @@map("teachers")
+}
+
+model TeacherSubject {
+  id        String  @id @default(uuid())
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id])
+  Teacher   Teacher @relation(fields: [teacherId], references: [id])
+  teacherId String
+  
+  @@map("teachers_subjects")
+}
+
+model Subject {
+  id             String           @id @default(uuid())
+  title          String
+  createdAt      DateTime         @default(now()) @map("created_at")
+  TeacherSubjects TeacherSubject[]
+
+  @@map("subjets")
 }
 
 model TeacherReview {
@@ -42,16 +58,15 @@ model TeacherReview {
   friendliness Int
   experienced  Int
   strictness   Int
-  smartless    Int 
-  avgRating    Float @default(0) @map("avg_rating")
-  Like         Like[]
+  smartless    Int
+  avgRating    Float   @default(0) @map("avg_rating")
+  Likes         Like[]
   userId       String  @map("user_id")
   user         User    @relation(fields: [userId], references: [id])
   teacher      Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   teacherId    String  @map("teacher_id")
 
   @@map("teachers_reviews")
-
 }
 
 model RefreshToken {
@@ -71,14 +86,6 @@ model Like {
   user            User          @relation(fields: [userId], references: [id])
 
   @@map("likes")
-}
-
-model Subject {
-  id        String    @id @default(uuid())
-  title     String
-  createdAt DateTime  @default(now()) @map("created_at")
-  teacher   Teacher[] // Один предмет может быть у нескольких учителей
-  @@map("subjets")
 }
 
 enum Roles {

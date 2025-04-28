@@ -10,7 +10,7 @@ export class TeacherService {
     return await this.prisma.teacher.create({ data: dto });
   }
 
-  async findMany(dto: Prisma.TeacherFindManyArgs): Promise<Teacher[]> {
+  async findMany(dto: Prisma.TeacherFindManyArgs = {}): Promise<Teacher[]> {
     return await this.prisma.teacher.findMany({ ...dto });
   }
 

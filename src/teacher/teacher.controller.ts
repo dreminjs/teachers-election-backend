@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Logger,
   Param,
   Patch,
   Post,
@@ -15,12 +16,12 @@ import {
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { TeacherService } from './teacher.service';
 import { Prisma, Roles, Teacher } from '@prisma/client';
-import { IInfiniteScrollResponse } from 'src/shared';
 import { GetTeachersQueryParameters } from './query-parameters/get-teacher.query-parameters';
 import { AccessTokenGuard } from 'src/token';
 import type {
   ITeacherExtended,
   ITeacherExtendedResponse,
+  ITeacherSubjectExtended,
 } from './teacher.interface';
 import { AllowedRoles, RolesGuard } from 'src/user';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -41,9 +42,11 @@ export class TeacherController {
     private readonly prisma: PrismaService
   ) {}
 
+  private logger = new Logger(TeacherController.name);
+
+  @UseGuards(RolesGuard)
   @UseInterceptors(FileInterceptor('file'), MinioFileUploadInterceptor)
   @AllowedRoles(Roles.ADMIN)
-  @UseGuards(RolesGuard)
   @HttpCode(HttpStatus.CREATED)
   @Post()
   async createOne(
@@ -52,10 +55,12 @@ export class TeacherController {
   ): Promise<Teacher> {
     return await this.teacherService.createOne({
       fullName,
-      subject: {
-        connect: { id: subjectId },
-      },
       photo,
+      teacherSubjects: {
+        create: {
+          subjectId,
+        },
+      },
     });
   }
 
@@ -86,116 +91,23 @@ export class TeacherController {
   }
 
   @Get()
-  async findMany(
-    @Query() queryParams: GetTeachersQueryParameters
-  ): Promise<any[]> {
-    const {
-      cursor: offset = 0,
-      limit = 10,
-      search,
-      subjectIds,
-      minAvgRating,
-      maxAvgRating,
-      minFreebie,
-      maxFreebie,
-      minFriendliness,
-      maxFriendliness,
-      minExperienced,
-      maxExperienced,
-      minStrictness,
-      maxStrictness,
-      minSmartless,
-      maxSmartless,
-      sortField = 'rating',
-      sortOrder = 'desc'
-    } = queryParams;
-  
-    // Явно преобразуем в числа
-    const numericLimit = Number(limit);
-    const numericOffset = Number(offset);
-  
-    // Строим условие ORDER BY
-    let orderByClause = 'AVG(tr.avg_rating) DESC NULLS LAST';
-    if (sortField && sortOrder) {
-      const sortFieldMap = {
-        freebie: 'AVG(tr.freebie)',
-        friendliness: 'AVG(tr.friendliness)',
-        experienced: 'AVG(tr.experienced)',
-        strictness: 'AVG(tr.strictness)',
-        smartless: 'AVG(tr.smartless)',
-        rating: 'AVG(tr.avg_rating)'
-      };
-      
-      const field = sortFieldMap[sortField] || 'AVG(tr.avg_rating)';
-      orderByClause = `${field} ${sortOrder.toUpperCase()} NULLS LAST`;
-    }
-  
-    const query = Prisma.sql`
-      SELECT 
-        t.id,
-        t.full_name,
-        t.photo,
-        t.subjet_id,
-        AVG(tr.freebie) AS avg_freebie,
-        AVG(tr.friendliness) AS avg_friendliness,
-        AVG(tr.experienced) AS avg_experienced,
-        AVG(tr.strictness) AS avg_strictness,
-        AVG(tr.smartless) AS avg_smartless,
-        AVG(tr.avg_rating) AS avg_rating,
-        COUNT(tr.id) AS review_count
-      FROM 
-        teachers t
-      LEFT JOIN 
-        teachers_reviews tr ON t.id = tr.teacher_id
-      WHERE 
-        (${search === null} OR t.full_name ILIKE '%' || ${search} || '%')
-        AND (${subjectIds === null} OR t.subjet_id = ANY(${subjectIds}))
-      GROUP BY 
-        t.id, t.full_name, t.photo, t.subjet_id
-      HAVING
-        (${minAvgRating === null} OR AVG(tr.avg_rating) >= ${minAvgRating})
-        AND (${maxAvgRating === null} OR AVG(tr.avg_rating) <= ${maxAvgRating})
-        AND (${minFreebie === null} OR AVG(tr.freebie) >= ${minFreebie})
-        AND (${maxFreebie === null} OR AVG(tr.freebie) <= ${maxFreebie})
-        AND (${minFriendliness === null} OR AVG(tr.friendliness) >= ${minFriendliness})
-        AND (${maxFriendliness === null} OR AVG(tr.friendliness) <= ${maxFriendliness})
-        AND (${minExperienced === null} OR AVG(tr.experienced) >= ${minExperienced})
-        AND (${maxExperienced === null} OR AVG(tr.experienced) <= ${maxExperienced})
-        AND (${minStrictness === null} OR AVG(tr.strictness) >= ${minStrictness})
-        AND (${maxStrictness === null} OR AVG(tr.strictness) <= ${maxStrictness})
-        AND (${minSmartless === null} OR AVG(tr.smartless) >= ${minSmartless})
-        AND (${maxSmartless === null} OR AVG(tr.smartless) <= ${maxSmartless})
-      ORDER BY 
-        ${Prisma.raw(orderByClause)}
-      LIMIT 
-        ${numericLimit}
-      OFFSET 
-        ${numericOffset}
-    `;
-  
-    try {
-      const result = await this.prisma.$queryRaw<any[]>(query);
-      return result;
-    } catch (error) {
-      console.error('Error executing query:', error);
-      throw new Error('Failed to fetch teachers');
-    }
+  public async findMany(): Promise<Teacher[]>{
+    return await this.teacherService.findMany()
   }
 
-  @Get("test")
-  public async test(){
-    return await this.teacherReviewService.groupBy({})
+  @Get('test')
+  public async test() {
+    return await this.teacherReviewService.groupBy({});
   }
-
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<ITeacherExtendedResponse> {
     const teacherQuery = this.teacherService.findOne({
       where: { id },
       include: {
-        subject: {
-          select: {
-            title: true,
+        teacherSubjects: {
+          include: {
+            subject: true,
           },
         },
       },
@@ -221,11 +133,7 @@ export class TeacherController {
     });
 
     const [
-      {
-        fullName,
-        subject: { title },
-        ...dto
-      },
+      teacher,
       {
         _avg: { freebie, friendliness, experienced, smartless, strictness },
       },
@@ -238,9 +146,9 @@ export class TeacherController {
 
     return {
       id,
-      fullName: fullName ? fullName : 'anon',
-      subject: title,
-      photo: dto?.photo ? dto.photo : null,
+      fullName: teacher.fullName,
+      photo: teacher.photo,
+      subjects: teacher.teacherSubjects.map((el) => el.subject),
       avgRatings: {
         freebie: Math.round(freebie),
         friendliness: Math.round(friendliness),

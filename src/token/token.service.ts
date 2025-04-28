@@ -1,9 +1,8 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ITokens } from './interfaces/tokens.interface';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma';
-import { UserService } from 'src/user';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -38,7 +37,6 @@ export class TokenService {
         }
       );
 
-      // Сохраняем новый refresh-токен
       await this.prisma.refreshToken.create({
         data: {
           token: refreshToken,
