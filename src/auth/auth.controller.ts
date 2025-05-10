@@ -86,14 +86,16 @@ export class AuthController {
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: 'strict',
       maxAge: 24 * 60 * 60 * 1000,
+      path:"/",
       secure: true,
     });
 
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      sameSite: 'lax',
+      path:"/",
+      sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
       secure: true,
     });
