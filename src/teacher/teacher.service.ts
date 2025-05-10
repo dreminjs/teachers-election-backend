@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, Subject, Teacher, TeacherReview } from '@prisma/client';
+import { Prisma, Teacher } from '@prisma/client';
 import { PrismaService } from 'src/prisma';
 import { GetTeachersQueryParameters } from './query-parameters/get-teacher.query-parameters';
 import { ITeacherExtendedResponse } from './teacher.interface';

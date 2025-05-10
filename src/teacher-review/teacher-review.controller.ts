@@ -162,7 +162,7 @@ export class TeacherReviewController {
     );
   }
 
-  @Post('/like')
+  @Post('like')
   public async like(
     @CurrentUser('id') userId: string,
     @Body() { teacherReviewId }: CreateTeacherReviewLikeDto
