@@ -29,6 +29,7 @@ export class TokenController {
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       sameSite: 'none',
+        path: '/',
       maxAge: 24 * 60 * 60 * 1000,
       secure: true,
     });
@@ -36,6 +37,7 @@ export class TokenController {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'none',
+        path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
       secure: true,
     });

@@ -11,7 +11,10 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  app.enableCors({ credentials: true, origin: true });
+  app.enableCors({ credentials: true, origin: [
+    "http://localhost:5173",
+    "https://teacher-election.vercel.app"
+  ] });
 
   app.useGlobalPipes(
     new ValidationPipe({
