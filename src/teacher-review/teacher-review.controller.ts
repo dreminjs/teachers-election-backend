@@ -24,7 +24,6 @@ import {
   ExtendedTeacherReviewResponse,
 } from './interfaces/teacher.interface';
 
-@UseGuards(AccessTokenGuard)
 @Controller('teacher-reviews')
 export class TeacherReviewController {
   constructor(
@@ -32,6 +31,7 @@ export class TeacherReviewController {
     private readonly likeService: LikeService
   ) {}
 
+  @UseGuards(AccessTokenGuard)
   @Post()
   async createOne(
     @CurrentUser('id') userId: string,
@@ -137,6 +137,7 @@ export class TeacherReviewController {
     };
   }
 
+  @UseGuards(AccessTokenGuard)
   @Delete(':id')
   async deleteOne(@Param('id') id: string): Promise<void> {
     await this.teacherReviewService.deleteOne({ id });
@@ -162,6 +163,7 @@ export class TeacherReviewController {
     );
   }
 
+@UseGuards(AccessTokenGuard)
   @Post('like')
   public async like(
     @CurrentUser('id') userId: string,
@@ -174,7 +176,7 @@ export class TeacherReviewController {
       },
     });
   }
-
+  @UseGuards(AccessTokenGuard)
   @UseGuards(LikeOwnerGuard)
   @Delete(':likeId')
   public async unlike(
