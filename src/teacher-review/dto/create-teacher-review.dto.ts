@@ -4,10 +4,14 @@ import {
   IsOptional,
   IsString,
   Max,
+  MaxLength,
   Min,
 } from 'class-validator';
 
 export class CreateTeacherReviewDto {
+
+
+  @MaxLength(500,{message:"слишком длинее сообщение!"})
   @IsString()
   @IsOptional()
   message: string | null;
